@@ -1,0 +1,243 @@
+﻿@use 'styles' as *;
+
+.profile-grades-tab {
+  padding: 24px;
+}
+
+.grades-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  color: $neutral-600;
+
+  p { margin: 12px 0 0; font-size: 14px; }
+}
+
+.spinning {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.grades-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  text-align: center;
+  background: $neutral-100;
+  border: 2px dashed $neutral-300;
+  border-radius: 12px;
+
+  h3 { margin: 16px 0 8px; font-size: 20px; font-weight: 600; color: $neutral-700; }
+  p  { margin: 0; font-size: 14px; color: $neutral-500; max-width: 320px; }
+}
+
+.grades-empty-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: $brand-100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon { font-size: 36px; width: 36px; height: 36px; color: $brand-400; }
+}
+
+.grades-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+
+.modules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.module-card {
+  background: $neutral-100;
+  border: 1px solid $neutral-300;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+
+  &:hover { border-color: $brand-300; }
+  &.is-expanded { border-color: $brand-400; }
+}
+
+.module-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover { background: $neutral-100; }
+}
+
+.module-header-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  gap: 0 24px;
+  min-width: 0;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+  }
+}
+
+.module-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.field-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: $neutral-500;
+}
+
+.field-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: $neutral-800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &--name {
+    font-size: 15px;
+    font-weight: 600;
+  }
+}
+
+.value-core    { color: #065f46; font-weight: 600; }
+.value-elective { color: $neutral-500; }
+
+
+.module-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.module-avg {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.module-avg-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.no-grade-text {
+  font-size: 12px;
+  color: $neutral-400;
+}
+
+.expand-icon {
+  color: $neutral-500;
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+
+  &.rotated { transform: rotate(180deg); }
+}
+
+.assessments-list {
+  border-top: 1px solid $neutral-300;
+}
+
+.assessments-empty {
+  padding: 16px 20px;
+  font-size: 13px;
+  color: $neutral-500;
+}
+
+.assessments-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+}
+
+.assessments-grid-header {
+  display: contents;
+
+  span {
+    padding: 8px 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: $neutral-500;
+    background: $neutral-100;
+    border-bottom: 1px solid $neutral-200;
+
+    &:first-child { padding-left: 20px; }
+  }
+}
+
+.assessments-grid-row {
+  display: contents;
+
+  &:hover > * { background: $neutral-100; }
+
+  & > * {
+    padding: 12px 20px;
+    font-size: 14px;
+    border-bottom: 1px solid $neutral-200;
+    display: flex;
+    align-items: center;
+  }
+
+  &:last-child > * { border-bottom: none; }
+}
+
+.assessment-name {
+  font-weight: 500;
+  color: $neutral-700;
+}
+
+.assessment-cell {
+  color: $neutral-600;
+}
+
+.assessment-grade {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.assessment-badge {
+  display: inline-flex !important;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  align-self: center;
+}

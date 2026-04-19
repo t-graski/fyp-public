@@ -1,0 +1,31 @@
+@if ($isOpen()) {
+  <div class="context-menu-backdrop">
+    <div
+      class="context-menu"
+      [style.left.px]="$position().x"
+      [style.top.px]="$position().y"
+      (clickOutside)="handleBackdropClick()"
+      (click)="stopPropagation($event)">
+      @for (action of $visibleActions(); track $index) {
+        @if (action.divider) {
+          <div class="context-menu-divider"></div>
+        } @else {
+          <button
+            class="context-menu-item"
+            [class.context-menu-item--disabled]="action.disabled"
+            [class.context-menu-item--danger]="action.danger"
+            (click)="handleAction(action)"
+            [disabled]="action.disabled">
+            @if (action.icon) {
+              <mat-icon [fontIcon]="action.icon"></mat-icon>
+            }
+            <span>{{ action.label }}</span>
+          </button>
+        }
+      }
+      @if ($visibleActions().length === 0) {
+        <div class="context-menu-empty">No actions available</div>
+      }
+    </div>
+  </div>
+}

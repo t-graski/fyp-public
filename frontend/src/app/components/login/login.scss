@@ -1,0 +1,365 @@
+@use 'styles' as *;
+
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  background: $brand-400;
+  position: relative;
+}
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+  z-index: 1;
+}
+
+.login-card {
+  background: $neutral-100;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
+}
+
+.header {
+  text-align: center;
+  padding: 48px 40px 32px;
+  background: $neutral-100;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: $brand-400;
+  border-radius: 50%;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba($brand-500, 0.3);
+}
+
+.icon mat-icon {
+  color: $neutral-100;
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+}
+
+.header h1 {
+  margin: 0 0 8px;
+  font-size: 26px;
+  font-weight: 700;
+  color: $neutral-800;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  margin: 0;
+  color: $neutral-600;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.form-wrapper {
+  padding: 0 40px 40px;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  color: $neutral-700;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 16px;
+  color: $neutral-500;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  transition: color 0.2s ease;
+}
+
+.input-container input {
+  width: 100%;
+  padding: 13px 16px 13px 48px;
+  border: 1.5px solid $neutral-300;
+  border-radius: 10px;
+  font-size: 15px;
+  background: $neutral-200;
+  transition: all 0.2s ease;
+  outline: none;
+  font-family: inherit;
+}
+
+.input-container input::placeholder {
+  color: $neutral-500;
+}
+
+.input-container input:focus {
+  border-color: $brand-400;
+  background: $neutral-100;
+  box-shadow: 0 0 0 3px rgba($brand-400, 0.1);
+}
+
+.input-container input:focus + .input-icon,
+.input-container:focus-within .input-icon {
+  color: $brand-400;
+}
+
+.extras-wrapper {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.remember {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.extras-wrapper input[type="checkbox"] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid $neutral-400;
+  border-radius: 4px;
+  background: $neutral-100;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.extras-wrapper input[type="checkbox"]:hover {
+  border-color: $brand-400;
+}
+
+.extras-wrapper input[type="checkbox"]:checked {
+  background: $brand-400;
+  border-color: $brand-400;
+}
+
+.extras-wrapper input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0px;
+  width: 4px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.remember label {
+  color: $neutral-700;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  margin: 0;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #fff5f5;
+  border: 1px solid $error-100;
+  border-radius: 8px;
+  color: $error-200;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.error-message mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.help-link-wrapper {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.help-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: $brand-500;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.help-link:hover {
+  color: $brand-500;
+  background: rgba($brand-400, 0.08);
+}
+
+.help-link mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.help-text {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: lighten($brand-400, 45%);
+  border: 1px solid lighten($brand-400, 35%);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.help-text mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: $brand-500;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.help-text p {
+  margin: 0;
+  color: $neutral-700;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.login-button {
+  width: 100%;
+  padding: 13px 24px;
+  border: none;
+  border-radius: 10px;
+  background: $brand-400;
+  color: $neutral-100;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba($brand-500, 0.4);
+  font-family: inherit;
+}
+
+.login-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba($brand-500, 0.5);
+  background: $brand-500;
+}
+
+.login-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba($brand-500, 0.4);
+}
+
+.login-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.footer {
+  text-align: center;
+  padding: 20px;
+  background: $neutral-200;
+  border-top: 1px solid $neutral-300;
+}
+
+.footer p {
+  margin: 0;
+  color: $neutral-600;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    padding: 16px;
+  }
+
+  .login-card {
+    max-width: 100%;
+  }
+
+  .header {
+    padding: 40px 32px 28px;
+  }
+
+  .form-wrapper {
+    padding: 0 32px 32px;
+  }
+
+  .header h1 {
+    font-size: 24px;
+  }
+}

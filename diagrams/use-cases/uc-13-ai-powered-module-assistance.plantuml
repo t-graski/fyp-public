@@ -1,0 +1,24 @@
+﻿@startuml
+title UC-FR-13 AI-Powered Module Assistance
+left to right direction
+
+actor "Student/Staff" as User
+
+rectangle "Academic Management System" {
+  (Use AI Chat in Module Page) as Chat
+  (Provide Module Context) as Context
+  (Authorize Module Access) as Authz
+  (Deny AI Access) as Deny
+}
+
+User -- Chat
+Chat ..> Authz : <<include>>
+Chat ..> Context : <<include>>
+Deny ..> Chat : <<extend>>
+
+note right of Deny
+Triggered when user is not authorized
+for the module
+end note
+
+@enduml

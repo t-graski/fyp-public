@@ -1,0 +1,19 @@
+@use 'styles' as *;
+
+.card {
+  background-color: $neutral-100;
+  border-radius: 12px;
+  border: 1px solid rgba(102, 102, 102, 0.5);
+  box-shadow: 0 5px 20px 0 rgba(194, 194, 194, 0.25);
+  padding: 10px 6px;
+}
+
+.card-clickable {
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+  }
+}

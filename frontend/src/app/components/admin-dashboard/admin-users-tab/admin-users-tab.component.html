@@ -1,0 +1,204 @@
+﻿<div class="view-container">
+  <div class="view-header">
+    <h2>Users Management</h2>
+    <div class="view-actions">
+      <button *appHasPermission="'UserWrite'"
+              class="action-btn-toolbar action-btn-toolbar--secondary"
+              (click)="importUsersFromCsv()" title="Import users from CSV">
+        <mat-icon fontIcon="upload_file"></mat-icon>
+        <span>Import CSV</span>
+      </button>
+      <button *appHasPermission="'UserWrite'"
+              class="action-btn-toolbar action-btn-toolbar--primary"
+              (click)="openCreateUserModal()" title="Add new user">
+        <mat-icon fontIcon="add"></mat-icon>
+        <span>Add User</span>
+      </button>
+    </div>
+  </div>
+
+  <app-dynamic-table
+    [$data]="$users()"
+    [$columns]="userColumns"
+    [$actions]="userActions"
+    [$loading]="$isLoading()"
+    [$searchPlaceholder]="'Search users by name, email, or role...'"
+    [$emptyMessage]="'No users found'"
+    ($reload)="reloadUsers()"
+  ></app-dynamic-table>
+</div>
+
+@if ($showCreateUserModal()) {
+  <div class="modal-overlay" (click)="closeCreateUserModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Create New User</h3>
+        <button class="modal-close" (click)="closeCreateUserModal()">
+          <mat-icon fontIcon="close"></mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input
+            type="text"
+            id="firstName"
+            [(ngModel)]="$newUser().firstName"
+            placeholder="Enter first name">
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input
+            type="text"
+            id="lastName"
+            [(ngModel)]="$newUser().lastName"
+            placeholder="Enter last name">
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            [(ngModel)]="$newUser().email"
+            placeholder="Enter email">
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            [(ngModel)]="$newUser().password"
+            placeholder="Enter password">
+        </div>
+
+        <div class="form-group">
+          <label for="systemRole">Role</label>
+          <select id="systemRole" [(ngModel)]="$newUser().roleId">
+            <option [ngValue]="null">No role</option>
+            @if (roleService.$rolesLoaded()) {
+              @for (role of roleService.$roles(); track role.id) {
+                <option [ngValue]="role.id">{{ role.name }}</option>
+              }
+            }
+          </select>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="$newUser().isActive">
+            <span>Active</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeCreateUserModal()">Cancel</button>
+        <button class="btn-primary" (click)="createUser()">Create User</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if ($showUserDetails()) {
+  <div class="modal-overlay" (click)="closeUserDetails()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>User Details</h3>
+        <button class="modal-close" (click)="closeUserDetails()">
+          <mat-icon fontIcon="close"></mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        @for (user of $users(); track user.id) {
+          @if (user.id === $showUserDetails()) {
+            <div class="detail-row">
+              <span class="detail-label">User ID:</span>
+              <span class="detail-value">{{ user.id }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Name:</span>
+              <span class="detail-value">{{ user.firstName }} {{ user.lastName }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Email:</span>
+              <span class="detail-value">{{ user.email }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Roles:</span>
+              <span class="detail-value">{{ getRoleName(user.roles) }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Status:</span>
+              <span class="detail-value">
+                <span class="status" [class.status--active]="user.isActive" [class.status--inactive]="!user.isActive">
+                  {{ user.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Permissions:</span>
+              <span class="detail-value">{{ user.permissions || 'None' }}</span>
+            </div>
+            @if (user.student) {
+              <div class="detail-row">
+                <span class="detail-label">Student ID:</span>
+                <span class="detail-value">{{ user.student.id }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Student Number:</span>
+                <span class="detail-value">{{ user.student.studentNumber || 'N/A' }}</span>
+              </div>
+            }
+          }
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeUserDetails()">Close</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if ($showAssignRoleModal()) {
+  <div class="modal-overlay" (click)="closeAssignRoleModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Assign Role</h3>
+        <button class="modal-close" (click)="closeAssignRoleModal()">
+          <mat-icon fontIcon="close"></mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="roleSelect">Roles:</label>
+          @if (roleService.$rolesLoaded()) {
+            <div class="role-list">
+              @for (role of roleService.$roles(); track role.id) {
+                <button
+                  class="role-item"
+                  [class.role-item--assigned]="isRoleAssigned(role.id!)"
+                  (click)="assignRole($showAssignRoleModal()!.userId, role.id!)">
+                  <mat-icon [fontIcon]="isRoleAssigned(role.id!) ? 'check_circle' : 'add_circle'"></mat-icon>
+                  <span>{{ role.name }}</span>
+                </button>
+              }
+            </div>
+          } @else {
+            <p class="loading-roles">Loading roles...</p>
+          }
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeAssignRoleModal()">Close</button>
+      </div>
+    </div>
+  </div>
+}

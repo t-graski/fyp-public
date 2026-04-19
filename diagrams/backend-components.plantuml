@@ -1,0 +1,43 @@
+﻿@startuml
+title CoreData Backend - High-Level Component Diagram
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+actor "Users\n(Students/Staff/Admin)" as Users
+component "Frontend\n(Angular)" as FE
+component "Backend API\n(ASP.NET Core)" as API
+database "Database\n(PostgreSQL)" as DB
+
+package "Backend API (logical components)" {
+
+  component "Authentication & Authorization\n(JWT + permissions)" as Auth
+  component "User Management\n(users, roles, status)" as UsersComp
+  component "Course & Module Catalog\n(courses, modules)" as Catalog
+  component "Enrollment Management\n(course/module enrollments)" as Enroll
+  component "Student Dashboard\n(aggregated view)" as Dash
+  component "Audit Logging\n(track admin actions)" as Audit
+
+  component "Data Access Layer\n(EF Core / DbContext)" as DAL
+}
+
+Users --> FE : Uses web UI
+FE --> API : HTTPS/JSON
+
+API --> Auth
+API --> UsersComp
+API --> Catalog
+API --> Enroll
+API --> Dash
+API --> Audit
+
+Auth --> DAL
+UsersComp --> DAL
+Catalog --> DAL
+Enroll --> DAL
+Dash --> DAL
+Audit --> DAL
+
+DAL --> DB : SQL
+
+@enduml

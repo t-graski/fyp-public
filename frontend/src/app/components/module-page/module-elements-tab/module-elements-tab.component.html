@@ -1,0 +1,423 @@
+﻿<div class="elements-tab">
+  @if ($elements().length > 0) {
+    <div class="elements-list">
+      @for (element of $elements(); track element.id; let i = $index) {
+        <div
+          class="element-item"
+          [id]="'element-' + element.id"
+          [class.element-item--highlighted]="$highlightedElementId() === element.id"
+          [class.element-item--draggable]="$editMode()"
+          [class.element-item--dragging]="$dragIndex() === i"
+          [class.element-item--drag-over]="$dragOverIndex() === i && $dragIndex() !== i"
+          [draggable]="$editMode()"
+          (dragstart)="$editMode() && onDragStart(i)"
+          (dragover)="$editMode() && onDragOver($event, i)"
+          (drop)="$editMode() && onDrop($event, i)"
+          (dragend)="onDragEnd()">
+
+          @if ($editMode()) {
+            <div class="drag-handle">
+              <mat-icon fontIcon="drag_indicator"></mat-icon>
+            </div>
+          }
+
+          <div class="element-content">
+            @if (element.iconKey) {
+              <mat-icon class="element-inline-icon" [fontIcon]="element.iconKey"></mat-icon>
+            }
+
+            @switch (element.type) {
+              @case (1) {
+                <span
+                  class="element-headline"
+                  [style.font-size.px]="getOptions(element)['fontSize'] || 24"
+                  [style.color]="getOptions(element)['color'] || null"
+                  [style.font-weight]="getOptions(element)['bold'] ? '700' : '600'"
+                  [style.font-style]="getOptions(element)['italic'] ? 'italic' : 'normal'">
+                  {{ getOptions(element)['text'] || '(No text)' }}
+                </span>
+              }
+              @case (2) {
+                <span class="element-text" [class]="'element-text--' + (getOptions(element)['size'] || 'md')">
+                  {{ getOptions(element)['text'] || '(No text)' }}
+                </span>
+              }
+              @case (3) {
+                <a
+                  class="element-link"
+                  [href]="getOptions(element)['url'] || '#'"
+                  [style.color]="getOptions(element)['color'] || null"
+                  target="_blank"
+                  rel="noopener">
+                  <span
+                    class="element-link-text">{{ getOptions(element)['name'] || getOptions(element)['url'] || 'Link' }}</span>
+                  <mat-icon fontIcon="open_in_new"></mat-icon>
+                </a>
+              }
+              @case (4) {
+                <div class="element-assessment">
+                  <span class="element-assessment-name">{{ getOptions(element)['name'] || 'Assessment' }}</span>
+                  @if (element.assessmentWeight != null) {
+                    <span class="element-assessment-weight">{{ element.assessmentWeight }}%</span>
+                  }
+                </div>
+              }
+              @case (5) {
+                <button class="element-file-download" (click)="downloadFile(element)"
+                        [disabled]="!getOptions(element)['fileId']">
+                  <mat-icon fontIcon="download"></mat-icon>
+                  <span>{{ getOptions(element)['fileName'] || 'Download File' }}</span>
+                </button>
+              }
+              @default {
+                <span class="element-default">{{ getElementTypeLabel(element.type) }}</span>
+              }
+            }
+          </div>
+
+          @if ($editMode()) {
+            <div class="element-edit-actions">
+              <button class="icon-button icon-button--edit" (click)="startEditing(element)" [disabled]="$isSaving()"
+                      title="Edit">
+                <mat-icon fontIcon="edit"></mat-icon>
+              </button>
+              <button class="icon-button icon-button--danger" (click)="deleteElement(element)" [disabled]="$isSaving()"
+                      title="Delete">
+                <mat-icon fontIcon="delete"></mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+
+        @if ($editMode() && $editingId() === element.id) {
+          <div class="edit-form">
+            <div class="options-row">
+              <label class="options-label">Icon</label>
+              <div class="icon-picker">
+                @for (opt of iconOptions; track opt.key) {
+                  <button class="icon-pick-button" [class.icon-pick-button--active]="$editIconKey() === opt.key"
+                          [class.icon-pick-button--none]="opt.key === ''" (click)="$editIconKey.set(opt.key)"
+                          [title]="opt.key === '' ? 'No icon' : opt.key">
+                    <mat-icon [fontIcon]="opt.icon"></mat-icon>
+                  </button>
+                }
+              </div>
+            </div>
+
+            @if (element.type === 1) {
+              <div class="options-row">
+                <label class="options-label">Text</label>
+                <input class="options-input" type="text" placeholder="Headline text..." [ngModel]="$editOptions().text"
+                       (ngModelChange)="patchEditOptions({text: $event})">
+              </div>
+              <div class="options-row">
+                <label class="options-label">Size</label>
+                <div class="button-group">
+                  @for (s of [['16', 'Small'], ['24', 'Medium'], ['32', 'Large'], ['40', 'XLarge']]; track s[0]) {
+                    <button class="button-group-item"
+                            [class.button-group-item--active]="($editOptions().fontSize ?? '24') === s[0]"
+                            (click)="patchEditOptions({fontSize: s[0]})">{{ s[1] }}
+                    </button>
+                  }
+                </div>
+              </div>
+              <div class="options-row">
+                <label class="options-label">Color</label>
+                <div class="color-picker">
+                  @for (c of [['', 'Default'], ['#1e3a5f', 'Navy'], ['#b91c1c', 'Red'], ['#15803d', 'Green'], ['#7c3aed', 'Purple'], ['#92400e', 'Amber']]; track c[0]) {
+                    <button class="color-swatch" [class.color-swatch--active]="($editOptions().color ?? '') === c[0]"
+                            [style.background]="c[0] || null" [title]="c[1]" (click)="patchEditOptions({color: c[0]})">
+                      @if (!c[0]) {
+                        <mat-icon fontIcon="format_color_reset"></mat-icon>
+                      }
+                    </button>
+                  }
+                </div>
+              </div>
+              <div class="options-row">
+                <label class="options-label">Style</label>
+                <div class="button-group">
+                  <button class="button-group-item" [class.button-group-item--active]="$editOptions().bold"
+                          (click)="patchEditOptions({bold: !$editOptions().bold})"><b>B</b></button>
+                  <button class="button-group-item" [class.button-group-item--active]="$editOptions().italic"
+                          (click)="patchEditOptions({italic: !$editOptions().italic})"><i>I</i></button>
+                </div>
+              </div>
+            }
+            @if (element.type === 2) {
+              <div class="options-row">
+                <label class="options-label">Text</label>
+                <textarea class="options-input options-input--textarea" placeholder="Body text..." rows="3"
+                          [ngModel]="$editOptions().text" (ngModelChange)="patchEditOptions({text: $event})"></textarea>
+              </div>
+              <div class="options-row">
+                <label class="options-label">Size</label>
+                <div class="button-group">
+                  @for (s of [['sm', 'Small'], ['md', 'Medium'], ['lg', 'Large']]; track s[0]) {
+                    <button class="button-group-item"
+                            [class.button-group-item--active]="($editOptions().size ?? 'md') === s[0]"
+                            (click)="patchEditOptions({size: s[0]})">{{ s[1] }}
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+            @if (element.type === 3) {
+              <div class="options-row">
+                <label class="options-label">Name</label>
+                <input class="options-input" type="text" placeholder="e.g. Course Materials"
+                       [ngModel]="$editOptions().name" (ngModelChange)="patchEditOptions({name: $event})">
+              </div>
+              <div class="options-row">
+                <label class="options-label">URL</label>
+                <input class="options-input" type="url" placeholder="https://..." [ngModel]="$editOptions().url"
+                       (ngModelChange)="patchEditOptions({url: $event})">
+              </div>
+              <div class="options-row">
+                <label class="options-label">Color</label>
+                <div class="color-picker">
+                  @for (c of [['', 'Default'], ['#1e3a5f', 'Navy'], ['#b91c1c', 'Red'], ['#15803d', 'Green'], ['#7c3aed', 'Purple'], ['#92400e', 'Amber']]; track c[0]) {
+                    <button class="color-swatch" [class.color-swatch--active]="($editOptions().color ?? '') === c[0]"
+                            [style.background]="c[0] || null" [title]="c[1]" (click)="patchEditOptions({color: c[0]})">
+                      @if (!c[0]) {
+                        <mat-icon fontIcon="format_color_reset"></mat-icon>
+                      }
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+            @if (element.type === 4) {
+              <div class="options-row">
+                <label class="options-label">Name</label>
+                <input class="options-input" type="text" placeholder="e.g. Coursework 1"
+                       [ngModel]="$editOptions().assessmentName"
+                       (ngModelChange)="patchEditOptions({assessmentName: $event})">
+              </div>
+              <div class="options-row">
+                <label class="options-label">Weight (%)</label>
+                <input class="options-input options-input--sm" type="number" min="0" max="100" placeholder="e.g. 30"
+                       [ngModel]="$editWeight()" (ngModelChange)="$editWeight.set($event)">
+              </div>
+            }
+            @if (element.type === 5) {
+              <div class="options-row">
+                <label class="options-label">File</label>
+                <div class="file-upload-area">
+                  @if ($editUploadedFile()) {
+                    <div class="file-chip">
+                      <mat-icon fontIcon="insert_drive_file"></mat-icon>
+                      <span>{{ $editUploadedFile()!.originalFileName }}</span>
+                      <button class="file-chip-remove" (click)="$editUploadedFile.set(null)" title="Remove">
+                        <mat-icon fontIcon="close"></mat-icon>
+                      </button>
+                    </div>
+                  } @else if (getOptions(element)['fileName']) {
+                    <div class="file-chip file-chip--existing">
+                      <mat-icon fontIcon="insert_drive_file"></mat-icon>
+                      <span>{{ getOptions(element)['fileName'] }}</span>
+                      <span class="file-chip-hint">(replace below)</span>
+                    </div>
+                  }
+                  <label class="file-upload-button" [class.file-upload-button--loading]="$isEditUploading()">
+                    <mat-icon [fontIcon]="$isEditUploading() ? 'hourglass_empty' : 'upload'"></mat-icon>
+                    <span>{{ $isEditUploading() ? 'Uploading...' : 'Choose file' }}</span>
+                    <input type="file" accept="application/pdf" hidden (change)="onEditFileSelected($event)"
+                           [disabled]="$isEditUploading()">
+                  </label>
+                  <span class="file-upload-hint">PDF only - max 50 MB</span>
+                </div>
+              </div>
+            }
+            <div class="add-confirm-actions">
+              <button class="button button--secondary" (click)="cancelEditing()">Cancel</button>
+              <button class="button button--primary" (click)="confirmEdit(element)" [disabled]="$isSaving()">
+                @if ($isSaving()) {
+                  Saving...
+                } @else {
+                  Save
+                }
+              </button>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  } @else {
+    <div class="empty-state">
+      <mat-icon fontIcon="inbox"></mat-icon>
+      <p>No elements in this module yet.</p>
+    </div>
+  }
+
+  @if ($editMode()) {
+    <div class="add-section">
+      <p class="add-label">Add element</p>
+      <div class="add-type-grid">
+        @for (t of elementTypes; track t.type) {
+          <button
+            class="add-type-button"
+            [class.add-type-button--active]="$addingType() === t.type"
+            (click)="selectType(t.type)">
+            <mat-icon [fontIcon]="t.icon"></mat-icon>
+            <span>{{ t.label }}</span>
+          </button>
+        }
+      </div>
+
+      @if ($addingType() != null) {
+        <div class="add-options">
+          <div class="options-row">
+            <label class="options-label">Icon</label>
+            <div class="icon-picker">
+              @for (opt of iconOptions; track opt.key) {
+                <button
+                  class="icon-pick-button"
+                  [class.icon-pick-button--active]="$newIconKey() === opt.key"
+                  [class.icon-pick-button--none]="opt.key === ''"
+                  (click)="$newIconKey.set(opt.key)"
+                  [title]="opt.key === '' ? 'No icon' : opt.key">
+                  <mat-icon [fontIcon]="opt.icon"></mat-icon>
+                </button>
+              }
+            </div>
+          </div>
+
+          @if ($addingType() === 1) {
+            <div class="options-row">
+              <label class="options-label">Text</label>
+              <input class="options-input" type="text" placeholder="Headline text…" [ngModel]="$newOptions().text"
+                     (ngModelChange)="patchOptions({text: $event})">
+            </div>
+            <div class="options-row">
+              <label class="options-label">Size</label>
+              <div class="button-group">
+                @for (s of [['16', 'Small'], ['24', 'Medium'], ['32', 'Large'], ['40', 'XLarge']]; track s[0]) {
+                  <button class="button-group-item"
+                          [class.button-group-item--active]="($newOptions().fontSize ?? '24') === s[0]"
+                          (click)="patchOptions({fontSize: s[0]})">{{ s[1] }}
+                  </button>
+                }
+              </div>
+            </div>
+            <div class="options-row">
+              <label class="options-label">Color</label>
+              <div class="color-picker">
+                @for (c of [['', 'Default'], ['#1e3a5f', 'Navy'], ['#b91c1c', 'Red'], ['#15803d', 'Green'], ['#7c3aed', 'Purple'], ['#92400e', 'Amber']]; track c[0]) {
+                  <button class="color-swatch" [class.color-swatch--active]="($newOptions().color ?? '') === c[0]"
+                          [style.background]="c[0] || null" [title]="c[1]" (click)="patchOptions({color: c[0]})">
+                    @if (!c[0]) {
+                      <mat-icon fontIcon="format_color_reset"></mat-icon>
+                    }
+                  </button>
+                }
+              </div>
+            </div>
+            <div class="options-row">
+              <label class="options-label">Style</label>
+              <div class="button-group">
+                <button class="button-group-item" [class.button-group-item--active]="$newOptions().bold"
+                        (click)="patchOptions({bold: !$newOptions().bold})"><b>B</b></button>
+                <button class="button-group-item" [class.button-group-item--active]="$newOptions().italic"
+                        (click)="patchOptions({italic: !$newOptions().italic})"><i>I</i></button>
+              </div>
+            </div>
+          }
+
+          @if ($addingType() === 2) {
+            <div class="options-row">
+              <label class="options-label">Text</label>
+              <textarea class="options-input options-input--textarea" placeholder="Body text..." rows="3"
+                        [ngModel]="$newOptions().text" (ngModelChange)="patchOptions({text: $event})"></textarea>
+            </div>
+            <div class="options-row">
+              <label class="options-label">Size</label>
+              <div class="button-group">
+                @for (s of [['sm', 'Small'], ['md', 'Medium'], ['lg', 'Large']]; track s[0]) {
+                  <button class="button-group-item"
+                          [class.button-group-item--active]="($newOptions().size ?? 'md') === s[0]"
+                          (click)="patchOptions({size: s[0]})">{{ s[1] }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
+          @if ($addingType() === 3) {
+            <div class="options-row">
+              <label class="options-label">Name</label>
+              <input class="options-input" type="text" placeholder="e.g. Course Materials"
+                     [ngModel]="$newOptions().name" (ngModelChange)="patchOptions({name: $event})">
+            </div>
+            <div class="options-row">
+              <label class="options-label">URL</label>
+              <input class="options-input" type="url" placeholder="https://..." [ngModel]="$newOptions().url"
+                     (ngModelChange)="patchOptions({url: $event})">
+            </div>
+            <div class="options-row">
+              <label class="options-label">Color</label>
+              <div class="color-picker">
+                @for (c of [['', 'Default'], ['#1e3a5f', 'Navy'], ['#b91c1c', 'Red'], ['#15803d', 'Green'], ['#7c3aed', 'Purple'], ['#92400e', 'Amber']]; track c[0]) {
+                  <button class="color-swatch" [class.color-swatch--active]="($newOptions().color ?? '') === c[0]"
+                          [style.background]="c[0] || null" [title]="c[1]" (click)="patchOptions({color: c[0]})">
+                    @if (!c[0]) {
+                      <mat-icon fontIcon="format_color_reset"></mat-icon>
+                    }
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
+          @if ($addingType() === 4) {
+            <div class="options-row">
+              <label class="options-label">Name</label>
+              <input class="options-input" type="text" placeholder="e.g. Coursework 1"
+                     [ngModel]="$newOptions().assessmentName" (ngModelChange)="patchOptions({assessmentName: $event})">
+            </div>
+            <div class="options-row">
+              <label class="options-label">Weight (%)</label>
+              <input class="options-input options-input--sm" type="number" min="0" max="100" placeholder="e.g. 30"
+                     [ngModel]="$newWeight()" (ngModelChange)="$newWeight.set($event)">
+            </div>
+          }
+
+          @if ($addingType() === 5) {
+            <div class="options-row">
+              <label class="options-label">File</label>
+              <div class="file-upload-area">
+                @if ($newUploadedFile()) {
+                  <div class="file-chip">
+                    <mat-icon fontIcon="insert_drive_file"></mat-icon>
+                    <span>{{ $newUploadedFile()!.originalFileName }}</span>
+                    <button class="file-chip-remove" (click)="$newUploadedFile.set(null)" title="Remove">
+                      <mat-icon fontIcon="close"></mat-icon>
+                    </button>
+                  </div>
+                }
+                <label class="file-upload-button" [class.file-upload-button--loading]="$isUploading()">
+                  <mat-icon [fontIcon]="$isUploading() ? 'hourglass_empty' : 'upload'"></mat-icon>
+                  <span>{{ $isUploading() ? 'Uploading…' : 'Choose file' }}</span>
+                  <input type="file" accept="application/pdf" hidden (change)="onFileSelected($event)"
+                         [disabled]="$isUploading()">
+                </label>
+                <span class="file-upload-hint">PDF only - max 2 MB</span>
+              </div>
+            </div>
+          }
+
+          <div class="add-confirm-actions">
+            <button class="button button--secondary" (click)="cancelAdding()">Cancel</button>
+            <button class="button button--primary" (click)="confirmAdd()" [disabled]="$isSaving()">
+              @if ($isSaving()) {
+                Saving...
+              } @else {
+                Add
+              }
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

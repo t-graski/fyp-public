@@ -1,0 +1,197 @@
+﻿<div class="profile-info-tab">
+  @if ($isLoading()) {
+    <div class="profile-info-loading">
+      <mat-icon fontIcon="hourglass_empty"></mat-icon>
+      <p>Loading profile information...</p>
+    </div>
+  } @else if ($user(); as u) {
+    <div class="profile-info-content">
+      <section class="profile-info-section">
+        <div class="profile-info-section-header">
+          <mat-icon fontIcon="person"></mat-icon>
+          <h3>Personal Information</h3>
+        </div>
+        <div class="profile-info-grid">
+          <div class="profile-info-item">
+            <label>Name</label>
+            <p>{{ fullName }}</p>
+          </div>
+          <div class="profile-info-item">
+            <label>Email</label>
+            <p>{{ u.email || 'N/A' }}</p>
+          </div>
+          @if (u.student?.studentNumber) {
+            <div class="profile-info-item">
+              <label>Student Number</label>
+              <p>{{ u.student?.studentNumber }}</p>
+            </div>
+          }
+          <div class="profile-info-item">
+            <label>Account Status</label>
+            <p>
+              <span class="profile-info-status-badge" [class.profile-info-status-badge--active]="u.isActive">
+                {{ u.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </p>
+          </div>
+          <div class="profile-info-item">
+            <label>Member Since</label>
+            <p>{{ u.createdAtUtc ? (u.createdAtUtc | date:'mediumDate') : 'N/A' }}</p>
+          </div>
+          <div class="profile-info-item">
+            <label>Roles</label>
+            <div class="profile-info-roles">
+              @for (role of u.roles; track role.id) {
+                <span class="profile-info-role-badge" [ngClass]="getRoleBadgeClass(role.key)">
+                  {{ role.name }}
+                </span>
+              } @empty {
+                <span class="profile-info-role-badge">No roles</span>
+              }
+            </div>
+          </div>
+        </div>
+      </section>
+
+      @if (u.studentRecord) {
+        <section class="profile-info-section">
+          <div class="profile-info-section-header">
+            <mat-icon fontIcon="badge"></mat-icon>
+            <h3>Student Record</h3>
+          </div>
+          <div class="profile-info-grid">
+            @if (u.studentRecord.personalEmail) {
+              <div class="profile-info-item">
+                <label>Personal Email</label>
+                <p>{{ u.studentRecord.personalEmail }}</p>
+              </div>
+            }
+            @if (u.studentRecord.phoneNumber) {
+              <div class="profile-info-item">
+                <label>Phone Number</label>
+                <p>{{ u.studentRecord.phoneNumber }}</p>
+              </div>
+            }
+            @if (u.studentRecord.gender) {
+              <div class="profile-info-item">
+                <label>Gender</label>
+                <p>{{ u.studentRecord.gender }}</p>
+              </div>
+            }
+            @if (u.studentRecord.homeAddress) {
+              <div class="profile-info-item profile-info-item--full">
+                <label>Home Address</label>
+                <p>{{ u.studentRecord.homeAddress }}</p>
+              </div>
+            }
+            @if (u.studentRecord.entryQualifications && u.studentRecord.entryQualifications.length > 0) {
+              <div class="profile-info-item profile-info-item--full">
+                <label>Entry Qualifications</label>
+                <div class="profile-info-tags">
+                  @for (q of u.studentRecord.entryQualifications; track q) {
+                    <span class="profile-info-tag">{{ q }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      @if ($dashboard()?.enrolledCourse; as course) {
+        <section class="profile-info-section">
+          <div class="profile-info-section-header">
+            <mat-icon fontIcon="school"></mat-icon>
+            <h3>Academic Information</h3>
+            <button class="profile-info-nav-btn" (click)="navigateToDashboard()" title="Go to dashboard">
+              <mat-icon fontIcon="open_in_new"></mat-icon>
+              Dashboard
+            </button>
+          </div>
+          <div class="profile-info-grid">
+            <div class="profile-info-item">
+              <label>Course</label>
+              <p>{{ course.title || 'N/A' }}</p>
+            </div>
+            @if (course.courseCode) {
+              <div class="profile-info-item">
+                <label>Course Code</label>
+                <p>{{ course.courseCode }}</p>
+              </div>
+            }
+            <div class="profile-info-item">
+              <label>Year of Study</label>
+              <p>Year {{ course.yearOfStudy }}</p>
+            </div>
+            <div class="profile-info-item">
+              <label>Semester</label>
+              <p>Semester {{ course.semester }}</p>
+            </div>
+            <div class="profile-info-item">
+              <label>Academic Year</label>
+              <p>{{ course.academicYear }}/{{ (course.academicYear ?? 0) + 1 }}</p>
+            </div>
+            <div class="profile-info-item">
+              <label>Enrollment Status</label>
+              <p>
+                <span class="profile-info-status-badge profile-info-status-badge--active">
+                  {{ getCourseEnrollmentStatus(course.status?.toString()) }}
+                </span>
+              </p>
+            </div>
+          </div>
+        </section>
+      }
+      @if ($dashboard()?.currentModules && $dashboard()!.currentModules!.length > 0) {
+        <section class="profile-info-section">
+          <div class="profile-info-section-header">
+            <mat-icon fontIcon="menu_book"></mat-icon>
+            <h3>Current Modules</h3>
+          </div>
+          <div class="profile-info-modules">
+            @for (mod of $dashboard()!.currentModules!; track mod.moduleId) {
+              <div class="profile-info-module-card" (click)="navigateToModule(mod.moduleId!)">
+                <div class="profile-info-module-card-header">
+                  <div class="profile-info-module-code">{{ mod.moduleCode }}</div>
+                  <mat-icon fontIcon="arrow_forward" class="profile-info-module-arrow"></mat-icon>
+                </div>
+                <div class="profile-info-module-name">{{ mod.title }}</div>
+                <div class="profile-info-module-meta">
+                  <span>Year {{ mod.yearOfStudy }}</span>
+                  <span>Semester {{ mod.semester }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      @if ($dashboard()?.pastModules && $dashboard()!.pastModules!.length > 0) {
+        <section class="profile-info-section">
+          <div class="profile-info-section-header">
+            <mat-icon fontIcon="history_edu"></mat-icon>
+            <h3>Past Modules</h3>
+          </div>
+          <div class="profile-info-modules">
+            @for (mod of $dashboard()!.pastModules!; track mod.moduleId) {
+              <div class="profile-info-module-card profile-info-module-card--past"
+                   (click)="navigateToModule(mod.moduleId!)">
+                <div class="profile-info-module-card-header">
+                  <div class="profile-info-module-code">{{ mod.moduleCode }}</div>
+                  <mat-icon fontIcon="arrow_forward" class="profile-info-module-arrow"></mat-icon>
+                </div>
+                <div class="profile-info-module-name">{{ mod.title }}</div>
+                <div class="profile-info-module-meta">
+                  <span>Year {{ mod.yearOfStudy }}</span>
+                  <span>Semester {{ mod.semester }}</span>
+                  <span class="profile-info-module-status">{{ mod.status }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+    </div>
+  }
+</div>

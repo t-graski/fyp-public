@@ -1,0 +1,83 @@
+@use 'styles' as *;
+
+.module-content {
+  padding: 24px;
+}
+
+.module-summary-container {
+  width: 100%;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: $neutral-800;
+  margin-bottom: 16px;
+}
+
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.module-card {
+  width: 100%;
+}
+
+.module-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.module-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: $neutral-800;
+  margin: 0;
+}
+
+.module-day {
+  font-size: 12px;
+  font-weight: 500;
+  color: $brand-500;
+  background: rgba($brand-500, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.module-period {
+  font-size: 14px;
+  font-weight: 400;
+  color: $neutral-600;
+  margin-bottom: 12px;
+}
+
+.module-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.sessions-count {
+  font-size: 14px;
+
+  .count-label {
+    color: $neutral-600;
+    font-weight: 400;
+  }
+
+  .count-value {
+    color: $neutral-800;
+    font-weight: 600;
+    margin-left: 4px;
+  }
+}
+
+.attendance-percent {
+  font-size: 20px;
+  font-weight: 700;
+}

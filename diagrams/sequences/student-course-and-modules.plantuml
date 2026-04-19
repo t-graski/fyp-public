@@ -1,0 +1,25 @@
+﻿@startuml
+title Sequence: Student Checks Course and Modules (Dashboard)
+
+actor "Student" as S
+participant "Frontend" as FE
+participant "Backend (API)" as BE
+database "PostgreSQL" as DB
+
+note over S,FE
+Precondition: Student is logged in (JWT stored).
+end note
+
+S -> FE: Open Dashboard
+FE -> BE: GET /api/me/dashboard\nAuthorization: Bearer <JWT>
+
+BE -> BE: Validate JWT + extract userId
+BE -> BE: Authorize (student permissions)
+
+BE -> DB: Load active course enrollment\n+ current/past module enrollments
+DB --> BE: Course + Module enrollment rows
+BE -> BE: Build StudentDashboardDto
+
+BE --> FE: 200 OK\nStudentDashboardDto
+FE --> S: Render course + module cards
+@enduml

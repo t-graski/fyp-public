@@ -1,0 +1,140 @@
+<div class="table-container">
+  <div class="table-header">
+    <div class="search-bar">
+      <mat-icon fontIcon="search"></mat-icon>
+      <input
+        type="text"
+        [placeholder]="$searchPlaceholder()"
+        [(ngModel)]="$searchQuery"
+        class="search-input"
+      />
+    </div>
+
+    <div class="table-actions">
+      <button class="action-btn" (click)="toggleColumnSelector()" title="Select columns">
+        <mat-icon fontIcon="view_column"></mat-icon>
+        <span>Columns</span>
+      </button>
+
+      <button class="action-btn" (click)="onReload()" title="Reload data">
+        <mat-icon fontIcon="refresh"></mat-icon>
+        <span>Reload</span>
+      </button>
+    </div>
+  </div>
+
+  @if ($showColumnSelector()) {
+    <div class="modal-overlay" (click)="closeColumnSelector()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Customize Columns</h3>
+          <button class="modal-close" (click)="closeColumnSelector()">
+            <mat-icon fontIcon="close"></mat-icon>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-description">Select which columns you want to display in the table. Changes are applied
+            immediately.</p>
+
+          <div class="column-list">
+            @for (column of $columns(); track column.key) {
+              <label class="column-option">
+                <input
+                  type="checkbox"
+                  [checked]="column.visible !== false"
+                  (change)="toggleColumn(column)"
+                />
+                <span>{{ column.label }}</span>
+              </label>
+            }
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn-primary" (click)="applyColumnChanges()">
+              <mat-icon fontIcon="check"></mat-icon>
+              Apply
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="table-wrapper">
+    @if ($loading()) {
+      <div class="loading-overlay">
+        <mat-icon fontIcon="refresh" class="spinning"></mat-icon>
+        <span>Loading...</span>
+      </div>
+    }
+
+    <table class="data-table">
+      <thead>
+      <tr>
+        @for (column of $visibleColumns(); track column.key) {
+          <th
+            [class.sortable]="column.sortable"
+            (click)="toggleSort(column)"
+          >
+            <span>{{ column.label }}</span>
+            @if (column.sortable) {
+              <mat-icon [fontIcon]="getSortIcon(column)"></mat-icon>
+            }
+          </th>
+        }
+      </tr>
+      </thead>
+      <tbody>
+        @for (item of $filteredData(); track item) {
+          <tr (contextmenu)="openContextMenu($event, item)" (click)="$rowClick.emit(item)">
+            @for (column of $visibleColumns(); track column.key) {
+              <td [class]="column.cellClass || ''" [title]="getCellValue(item, column)">
+                {{ getCellValue(item, column) }}
+              </td>
+            }
+          </tr>
+        } @empty {
+          <tr>
+            <td [attr.colspan]="getVisibleColumnCount()" class="no-data">
+              {{ getEmptyMessage() }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <app-context-menu
+    [$actions]="$contextMenuActions()"
+    [$isOpen]="$isContextMenuOpen()"
+    [$position]="$contextMenuPosition()"
+    (close)="closeContextMenu()"
+  />
+
+  @if ($showDeleteConfirmation()) {
+    <div class="modal-overlay" (click)="cancelDelete()">
+      <div class="modal-content modal-content--confirm" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Confirm Delete</h3>
+          <button class="modal-close" (click)="cancelDelete()">
+            <mat-icon fontIcon="close"></mat-icon>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-description">{{ $deleteConfirmationMessage() }}</p>
+          <p class="modal-warning">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" (click)="cancelDelete()">
+            Cancel
+          </button>
+          <button class="btn-danger" (click)="confirmDelete()">
+            <mat-icon fontIcon="delete"></mat-icon>
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+

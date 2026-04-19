@@ -1,0 +1,72 @@
+﻿<div class="bulk-backdrop" (click)="close()">
+  <div class="bulk-dialog" (click)="$event.stopPropagation()">
+
+    <div class="bulk-header">
+      <div class="bulk-title">
+        <mat-icon fontIcon="assignment_turned_in"></mat-icon>
+        <h2>Import Results</h2>
+      </div>
+      <div class="bulk-header-right">
+        <span class="stat-pill success">
+          <mat-icon fontIcon="check_circle"></mat-icon>
+          {{ $succeeded() }} created
+        </span>
+        @if ($failed() > 0) {
+          <span class="stat-pill failed">
+            <mat-icon fontIcon="cancel"></mat-icon>
+            {{ $failed() }} failed
+          </span>
+        }
+        <button class="bulk-close" (click)="close()">
+          <mat-icon fontIcon="close"></mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="bulk-filters">
+      <button class="filter-btn" [class.active]="$filter() === 'all'" (click)="$filter.set('all')">All ({{ items().length }})</button>
+      <button class="filter-btn" [class.active]="$filter() === 'success'" (click)="$filter.set('success')">Created ({{ $succeeded() }})</button>
+      <button class="filter-btn failed" [class.active]="$filter() === 'failed'" (click)="$filter.set('failed')">Failed ({{ $failed() }})</button>
+    </div>
+
+    <div class="bulk-table-wrapper">
+      <table class="bulk-table">
+        <thead>
+          <tr>
+            <th class="col-status"></th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of $filtered(); track item.key) {
+            <tr>
+              <td class="col-status">
+                @if (item.success) {
+                  <mat-icon fontIcon="check_circle" class="icon-success"></mat-icon>
+                } @else {
+                  <mat-icon fontIcon="cancel" class="icon-failed"></mat-icon>
+                }
+              </td>
+              <td>{{ item.input.firstName }} {{ item.input.lastName }}</td>
+              <td class="col-email">{{ item.input.email }}</td>
+              <td class="col-result">
+                @if (item.success) {
+                  <span class="result-success">Created successfully</span>
+                } @else {
+                  <span class="result-error">{{ item.errorMessage ?? item.errorCode ?? 'Unknown error' }}</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="bulk-footer">
+      <button class="close-btn" (click)="close()">Close</button>
+    </div>
+
+  </div>
+</div>

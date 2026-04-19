@@ -1,0 +1,14 @@
+<div class="progress-bar">
+  <div class="progress-bar-track">
+    <div class="progress-bar-fill" [ngStyle]="{
+      width: clamp(value) + '%',
+      backgroundColor: color
+    }"></div>
+  </div>
+
+  @if (showValue) {
+    <span class="progress-bar-value">
+    {{ clamp(value) }}%
+  </span>
+  }
+</div>

@@ -1,0 +1,37 @@
+@startuml
+title Authentication & Authorization Flow (Login + Protected Requests)
+
+actor User
+participant "Frontend" as FE
+participant "Backend (API)" as BE
+database "User DB" as DB
+
+== Login Flow ==
+User -> FE: Enter email + password
+FE -> BE: POST /auth/login\n{ email, password }
+
+BE -> DB: Find user by email
+DB --> BE: User record (hash, roles, permissions)
+
+BE -> BE: Verify password hash
+BE -> BE: Generate accessToken (JWT)
+
+BE --> FE: 200 OK\n{ accessToken }
+
+FE -> FE: Store accessToken
+
+== Authenticated Request Flow ==
+User -> FE: Perform protected action
+FE -> BE: GET /api/resource\nAuthorization: Bearer <accessToken>
+
+BE -> BE: Validate JWT signature
+BE -> BE: Extract userId + roles + permissions
+BE -> BE: Check permissions for endpoint
+
+alt Authorized
+    BE --> FE: 200 OK\n{ protected data }
+else Unauthorized
+    BE --> FE: 403 Forbidden
+end
+
+@enduml

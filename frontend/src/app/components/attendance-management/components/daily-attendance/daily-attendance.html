@@ -1,0 +1,63 @@
+<app-card [clickable]="false" class="daily-attendance-container">
+  <div class="daily-content">
+    <h2 class="section-title">Daily Attendance Log</h2>
+
+    <div class="days-list">
+      @for (day of $days(); track day.date) {
+        <app-card [clickable]="false" class="day-card">
+          <div class="day-header">
+            <div class="day-info">
+              <mat-icon class="calendar-icon">calendar_today</mat-icon>
+              <div class="day-date">
+                <div class="date-main">{{ day.date | date: 'EEEE, MMMM d' }}</div>
+                <div class="date-year">{{ day.date | date: 'yyyy' }}</div>
+              </div>
+            </div>
+            <div class="modules-badge">
+              {{ day.attendedModulesCount ?? 0 }} attended
+            </div>
+          </div>
+
+          @if ((day.modules?.length ?? 0) > 0) {
+            <div class="modules-list">
+              @for (module of day.modules; track module.moduleId) {
+                <div class="module-item" [class.module-item--missed]="!isModuleAttended(module)">
+                  @if (isModuleAttended(module)) {
+                    <mat-icon class="attended-icon">check_circle</mat-icon>
+                  } @else {
+                    <mat-icon class="missed-icon">cancel</mat-icon>
+                  }
+
+                  <div class="module-info">
+                    <div class="module-name">{{ module.moduleName }}</div>
+                    <div class="module-meta">
+                      <span class="scheduled-time">
+                        {{ formatTime(module.scheduledStartLocal) }} - {{ formatTime(module.scheduledEndLocal) }}
+                      </span>
+
+                      @if (isModuleAttended(module)) {
+                        <span class="checked-in-time">Checked in at {{ module.checkedInAtUtc | date: 'h:mm a' }}</span>
+                      } @else {
+                        <span class="missed-label">Missed</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="no-attendance">
+              <mat-icon class="warning-icon">event_busy</mat-icon>
+              <span>No scheduled modules</span>
+            </div>
+          }
+        </app-card>
+      } @empty {
+        <div class="empty-state-wrapper">
+          <mat-icon class="empty-icon">event_note</mat-icon>
+          <p class="empty-message">No attendance records found for this period</p>
+        </div>
+      }
+    </div>
+  </div>
+</app-card>

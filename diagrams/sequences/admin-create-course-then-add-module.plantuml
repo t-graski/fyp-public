@@ -1,0 +1,34 @@
+﻿@startuml
+title Sequence: Admin Creates Course and Adds Module (Authenticated)
+
+actor "Admin / Registry Staff" as A
+participant "Frontend" as FE
+participant "Backend (API)" as BE
+database "PostgreSQL" as DB
+
+note over A,FE
+Precondition: Admin is logged in (JWT available).
+end note
+
+== Create Course ==
+A -> FE: Fill course form (code, title, etc.)
+FE -> BE: POST /api/admin/courses\nAuthorization: Bearer <JWT>\nCreateCourseDto
+
+BE -> BE: Validate JWT + authorize (AdminCatalog permission)
+BE -> BE: Validate request body
+BE -> DB: INSERT Course
+DB --> BE: New CourseId
+BE --> FE: 201 Created\nAdminCourseDetailDto (includes id)
+
+== Add Module to Course ==
+A -> FE: Add module to course
+FE -> BE: POST /api/admin/courses/{courseId}/modules\nAuthorization: Bearer <JWT>\nCreateModuleDto
+
+BE -> BE: Authorize (AdminCatalog permission)
+BE -> BE: Validate request body
+BE -> DB: INSERT Module (linked to CourseId)
+DB --> BE: New ModuleId
+BE --> FE: 201 Created\nAdminModuleDto
+
+FE --> A: Show updated course/module list
+@enduml

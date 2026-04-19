@@ -1,0 +1,33 @@
+﻿@startuml
+title Sequence: Admin Enrolls Student (Course + Module)
+
+actor "Admin / Registry Staff" as A
+participant "Frontend" as FE
+participant "Backend (API)" as BE
+database "PostgreSQL" as DB
+
+note over A,FE
+Precondition: Admin is logged in (JWT available).
+end note
+
+== Enroll Student in Course ==
+A -> FE: Select student + course
+FE -> BE: POST /api/admin/students/{studentId}/course/enrollment\nAuthorization: Bearer <JWT>\nEnrollInCourseDto
+
+BE -> BE: Validate JWT + authorize (ManageUsers permission)
+BE -> BE: Validate enrollment rules\n(student exists, course exists)
+BE -> DB: INSERT CourseEnrollment
+DB --> BE: OK
+BE --> FE: 201 Created\n{ success=true }
+
+== Enroll Student in Module ==
+A -> FE: Select module for that student
+FE -> BE: POST /api/admin/students/{studentId}/modules/{moduleId}/enroll\nAuthorization: Bearer <JWT>\nEnrollInModuleDto
+
+BE -> BE: Authorize (AdminEnrollment permission)
+BE -> BE: Validate rules\n(module belongs to course, no duplicate enrollment)
+BE -> DB: INSERT ModuleEnrollment
+DB --> BE: OK
+BE --> FE: 201 Created\n{ success=true }
+
+@enduml

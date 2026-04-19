@@ -1,0 +1,302 @@
+<div class="enrollment-details-overlay" (click)="onClose()">
+  <div class="enrollment-details-modal" (click)="$event.stopPropagation(); closeContextMenu()">
+    <div class="modal-header">
+      <div class="header-content">
+        <h2>{{ $title() }}</h2>
+        @if ($entityName()) {
+          <p class="entity-name">{{ $entityName() }}</p>
+        }
+      </div>
+      <div class="header-actions">
+        @if ($mode() === 'course' || $mode() === 'module') {
+          <button class="enroll-btn" (click)="handleEnrollStudents()" title="Add Students">
+            <mat-icon fontIcon="person_add"></mat-icon>
+            <span>Add Students</span>
+          </button>
+        }
+        <button class="close-btn" (click)="onClose()" title="Close">
+          <mat-icon fontIcon="close"></mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      @if ($isLoading()) {
+        <div class="loading-state">
+          <mat-icon fontIcon="hourglass_empty"></mat-icon>
+          <p>Loading enrollment data...</p>
+        </div>
+      } @else {
+        @if ($mode() === 'user') {
+          @let data = $userEnrollmentData();
+          @if (!data) {
+            <div class="empty-state">
+              <mat-icon fontIcon="info"></mat-icon>
+              <p>No enrollment data found for this student.</p>
+            </div>
+          } @else {
+            <div class="enrollment-section">
+              <h3>Student Information</h3>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="label">Student ID:</span>
+                  <div class="value-with-copy">
+                    <span class="value">{{ data.studentId }}</span>
+                    <button class="copy-btn" (click)="copyToClipboard(data.studentId, 'Student ID')" title="Copy">
+                      <mat-icon fontIcon="content_copy"></mat-icon>
+                    </button>
+                  </div>
+                </div>
+                <div class="info-item">
+                  <span class="label">Student Number:</span>
+                  <div class="value-with-copy">
+                    <span class="value">{{ data.studentNumber || 'N/A' }}</span>
+                    <button class="copy-btn" (click)="copyToClipboard(data.studentNumber, 'Student Number')" title="Copy">
+                      <mat-icon fontIcon="content_copy"></mat-icon>
+                    </button>
+                  </div>
+                </div>
+                <div class="info-item">
+                  <span class="label">Name:</span>
+                  <span class="value">{{ data.firstName }} {{ data.lastName }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Email:</span>
+                  <div class="value-with-copy">
+                    <span class="value">{{ data.email || 'N/A' }}</span>
+                    <button class="copy-btn" (click)="copyToClipboard(data.email, 'Email')" title="Copy">
+                      <mat-icon fontIcon="content_copy"></mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="enrollment-section">
+              <h3>Course Enrollments</h3>
+              @if (!data.courses || data.courses.length === 0) {
+                <div class="empty-state-small">
+                  <mat-icon fontIcon="school"></mat-icon>
+                  <p>No course enrollments found.</p>
+                </div>
+              } @else {
+                <div class="enrollment-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Course</th>
+                        <th>Status</th>
+                        <th>Academic Year</th>
+                        <th>Year of Study</th>
+                        <th>Semester</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (course of data.courses; track course.enrollmentId) {
+                        <tr>
+                          <td>
+                            <div class="course-info">
+                              <strong>{{ course.title }}</strong>
+                              <span class="course-code">{{ course.courseCode }}</span>
+                            </div>
+                          </td>
+                          <td>
+                            <span class="status-badge" [class]="getStatusClass(course.status)">
+                              {{ getStatusLabel(course.status) }}
+                            </span>
+                          </td>
+                          <td>{{ course.academicYear || 'N/A' }}</td>
+                          <td>{{ course.yearOfStudy || 'N/A' }}</td>
+                          <td>{{ course.semester || 'N/A' }}</td>
+                          <td>{{ formatDate(course.startDateUtc) }}</td>
+                          <td>{{ formatDate(course.endDateUtc) }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+            </div>
+
+            <div class="enrollment-section">
+              <h3>Module Enrollments</h3>
+              @if (!data.modules || data.modules.length === 0) {
+                <div class="empty-state-small">
+                  <mat-icon fontIcon="menu_book"></mat-icon>
+                  <p>No module enrollments found.</p>
+                </div>
+              } @else {
+                <div class="enrollment-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Module</th>
+                        <th>Status</th>
+                        <th>Academic Year</th>
+                        <th>Year of Study</th>
+                        <th>Semester</th>
+                        <th>Enrolled At</th>
+                        <th>Completed At</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (module of data.modules; track module.enrollmentId) {
+                        <tr>
+                          <td>
+                            <div class="module-info">
+                              <strong>{{ module.title }}</strong>
+                              <span class="module-code">{{ module.moduleCode }}</span>
+                            </div>
+                          </td>
+                          <td>
+                            <span class="status-badge" [class]="getStatusClass(module.status)">
+                              {{ getStatusLabel(module.status) }}
+                            </span>
+                          </td>
+                          <td>{{ module.academicYear || 'N/A' }}</td>
+                          <td>{{ module.yearOfStudy || 'N/A' }}</td>
+                          <td>{{ module.semester || 'N/A' }}</td>
+                          <td>{{ formatDate(module.enrolledAtUtc) }}</td>
+                          <td>{{ formatDate(module.completedAtUtc) }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+            </div>
+          }
+        }
+
+        @if ($mode() === 'course') {
+          @if ($courseEnrollmentData().length === 0) {
+            <div class="empty-state">
+              <mat-icon fontIcon="person_off"></mat-icon>
+              <p>No students enrolled in this course.</p>
+            </div>
+          } @else {
+            <div class="enrollment-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Student Number</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Academic Year</th>
+                    <th>Year of Study</th>
+                    <th>Semester</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                  </tr>
+                </thead>
+                    <tbody>
+                      @for (enrollment of $courseEnrollmentData(); track enrollment.courseEnrollmentId) {
+                        <tr (contextmenu)="openContextMenu($event, enrollment.courseEnrollmentId!, 'course')">
+                          <td>
+                        <div class="student-info">
+                          <strong>{{ enrollment.student?.firstName }} {{ enrollment.student?.lastName }}</strong>
+                        </div>
+                      </td>
+                      <td>{{ enrollment.student?.studentNumber || 'N/A' }}</td>
+                      <td>
+                        <div class="value-with-copy">
+                          <span>{{ enrollment.student?.email || 'N/A' }}</span>
+                          <button class="copy-btn-inline" (click)="copyToClipboard(enrollment.student?.email, 'Email')" title="Copy">
+                            <mat-icon fontIcon="content_copy"></mat-icon>
+                          </button>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="status-badge" [class]="getStatusClass(enrollment.status)">
+                          {{ getStatusLabel(enrollment.status) }}
+                        </span>
+                      </td>
+                      <td>{{ enrollment.academicYear || 'N/A' }}</td>
+                      <td>{{ enrollment.yearOfStudy || 'N/A' }}</td>
+                      <td>{{ enrollment.semester || 'N/A' }}</td>
+                      <td>{{ formatDate(enrollment.startDateUtc) }}</td>
+                      <td>{{ formatDate(enrollment.endDateUtc) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        }
+
+        @if ($mode() === 'module') {
+          @if ($moduleEnrollmentData().length === 0) {
+            <div class="empty-state">
+              <mat-icon fontIcon="person_off"></mat-icon>
+              <p>No students enrolled in this module.</p>
+            </div>
+          } @else {
+            <div class="enrollment-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Student Number</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Academic Year</th>
+                    <th>Year of Study</th>
+                    <th>Semester</th>
+                    <th>Enrolled At</th>
+                    <th>Completed At</th>
+                  </tr>
+                </thead>
+                    <tbody>
+                      @for (enrollment of $moduleEnrollmentData(); track enrollment.moduleEnrollmentId) {
+                        <tr (contextmenu)="openContextMenu($event, enrollment.moduleEnrollmentId!, 'module')">
+                          <td>
+                        <div class="student-info">
+                          <strong>{{ enrollment.student?.firstName }} {{ enrollment.student?.lastName }}</strong>
+                        </div>
+                      </td>
+                      <td>{{ enrollment.student?.studentNumber || 'N/A' }}</td>
+                      <td>
+                        <div class="value-with-copy">
+                          <span>{{ enrollment.student?.email || 'N/A' }}</span>
+                          <button class="copy-btn-inline" (click)="copyToClipboard(enrollment.student?.email, 'Email')" title="Copy">
+                            <mat-icon fontIcon="content_copy"></mat-icon>
+                          </button>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="status-badge" [class]="getStatusClass(enrollment.status)">
+                          {{ getStatusLabel(enrollment.status) }}
+                        </span>
+                      </td>
+                      <td>{{ enrollment.academicYear || 'N/A' }}</td>
+                      <td>{{ enrollment.yearOfStudy || 'N/A' }}</td>
+                      <td>{{ enrollment.semester || 'N/A' }}</td>
+                      <td>{{ formatDate(enrollment.enrolledAtUtc) }}</td>
+                      <td>{{ formatDate(enrollment.completedAtUtc) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        }
+      }
+    </div>
+
+    @if ($contextMenuPosition(); as pos) {
+      <div class="context-menu"
+           [style.left.px]="pos.x"
+           [style.top.px]="pos.y"
+           (click)="$event.stopPropagation()">
+        <button class="context-menu-item context-menu-item--danger" (click)="handleCancelEnrollment()">
+          <mat-icon fontIcon="cancel"></mat-icon>
+          <span>Cancel Enrollment</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>
+

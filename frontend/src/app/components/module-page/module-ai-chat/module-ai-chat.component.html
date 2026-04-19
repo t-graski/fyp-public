@@ -1,0 +1,116 @@
+﻿@if (!$isOpen()) {
+  <button class="chat-fab" (click)="open()" aria-label="Open AI Assistant">
+    <mat-icon fontIcon="auto_awesome"></mat-icon>
+    <span>AI Assistant</span>
+  </button>
+}
+
+<div class="chat-panel">
+  <div class="chat-header">
+    <div class="chat-header-left">
+      <div class="chat-ai-avatar">
+        <mat-icon fontIcon="auto_awesome"></mat-icon>
+      </div>
+      <div>
+        <div class="chat-title">AI Assistant</div>
+        <div class="chat-subtitle">Ask anything about this module</div>
+      </div>
+    </div>
+    <div class="chat-header-actions">
+      <button class="chat-icon-btn" (click)="toggleThreadList()" [class.chat-icon-btn--active]="$showThreadList()"
+              title="Conversation history">
+        <mat-icon fontIcon="history"></mat-icon>
+      </button>
+      <button class="chat-icon-btn" (click)="createNewThread()" title="New conversation">
+        <mat-icon fontIcon="edit_square"></mat-icon>
+      </button>
+      <button class="chat-icon-btn" (click)="close()" title="Close">
+        <mat-icon fontIcon="close"></mat-icon>
+      </button>
+    </div>
+  </div>
+
+  @if ($showThreadList()) {
+    <div class="thread-list">
+      <div class="thread-list-header">Conversations</div>
+      @if ($threads().length === 0) {
+        <div class="thread-list-empty">No conversations yet</div>
+      }
+      @for (thread of $threads(); track thread.id) {
+        <button
+          class="thread-item"
+          [class.thread-item--active]="$activeThreadId() === thread.id"
+          (click)="selectThread(thread.id!)">
+          <mat-icon fontIcon="chat_bubble_outline"></mat-icon>
+          <span class="thread-item-title">{{ thread.title || 'New chat' }}</span>
+        </button>
+      }
+    </div>
+  }
+
+  <div class="chat-messages" #messagesContainer>
+    @if ($isLoading() && $messages().length === 0) {
+      <div class="chat-loading">
+        <span class="loading-text">Loading...</span>
+      </div>
+    } @else if ($messages().length === 0 && !$isLoading()) {
+      <div class="chat-empty">
+        <div class="empty-icon-wrap">
+          <mat-icon fontIcon="auto_awesome"></mat-icon>
+        </div>
+        <h3>How can I help?</h3>
+        <p>Ask me about module content, assessments, deadlines, or any concept you'd like explained.</p>
+      </div>
+    } @else {
+      @for (msg of $messages(); track msg.id) {
+        <div class="message" [class.message--user]="msg.role === 'user'"
+             [class.message--assistant]="msg.role === 'assistant'">
+          @if (msg.role === 'assistant') {
+            <div class="message-avatar">
+              <mat-icon fontIcon="auto_awesome"></mat-icon>
+            </div>
+          }
+            <div class="message-body">
+              <div class="message-bubble">{{ msg.content }}</div>
+              @if (msg.role === 'assistant' && msg.id && $highlightMap()[msg.id]) {
+                <button class="highlight-btn" (click)="emitHighlight($highlightMap()[msg.id!])">
+                  <mat-icon fontIcon="highlight"></mat-icon>
+                  <span>Show in module</span>
+                </button>
+              }
+            </div>
+        </div>
+      }
+      @if ($isSending()) {
+        <div class="message message--assistant">
+          <div class="message-avatar">
+            <mat-icon fontIcon="auto_awesome"></mat-icon>
+          </div>
+          <div class="message-body">
+            <div class="message-bubble message-bubble--thinking">Thinking...</div>
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  <div class="chat-input-area">
+    <textarea
+      #inputField
+      class="chat-input"
+      placeholder="Ask something..."
+      rows="1"
+      [value]="$messageInput()"
+      (input)="onInputChange($event)"
+      (keydown)="onInputKeydown($event)"
+      [disabled]="$isSending()">
+    </textarea>
+    <button
+      class="chat-send-btn"
+      (click)="sendMessage()"
+      [disabled]="!$messageInput().trim() || $isSending()"
+      title="Send">
+      <mat-icon fontIcon="arrow_upward"></mat-icon>
+    </button>
+  </div>
+</div>

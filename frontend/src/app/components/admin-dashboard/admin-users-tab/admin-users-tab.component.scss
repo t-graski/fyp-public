@@ -1,0 +1,68 @@
+﻿@use 'styles' as *;
+
+.current-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.no-roles {
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.role-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.role-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background-color: var(--color-background-secondary);
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: var(--color-background-hover);
+    border-color: var(--color-primary);
+  }
+
+  &--assigned {
+    background-color: var(--color-primary-light);
+    border-color: var(--color-primary);
+
+    mat-icon {
+      color: var(--color-primary);
+    }
+  }
+
+  span {
+    font-weight: 500;
+  }
+}
+
+.loading-roles {
+  text-align: center;
+  color: var(--color-text-secondary);
+  padding: 20px;
+}

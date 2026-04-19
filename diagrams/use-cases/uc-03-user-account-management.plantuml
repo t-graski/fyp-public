@@ -1,0 +1,37 @@
+﻿@startuml
+title UC-FR-03 User Account Management
+left to right direction
+
+actor "Administrator" as Admin
+
+rectangle "Academic Management System" {
+  (Create User Account) as Create
+  (View User Accounts) as View
+  (Edit User Account) as Edit
+  (Activate/Deactivate User) as Active
+  (Assign/Remove Roles) as Roles
+
+  (Validate User Data) as Validate
+  (Reject User Operation) as Reject
+}
+
+Admin -- Create
+Admin -- View
+Admin -- Edit
+Admin -- Active
+Admin -- Roles
+
+Create ..> Validate : <<include>>
+Edit ..> Validate : <<include>>
+Roles ..> Validate : <<include>>
+Reject ..> Create : <<extend>>
+Reject ..> Edit : <<extend>>
+
+note right of Reject
+Triggered when:
+- email already exists
+- invalid role
+- user not found
+end note
+
+@enduml

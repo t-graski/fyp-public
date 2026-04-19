@@ -1,0 +1,42 @@
+﻿@startuml
+title Technology Stack Overview - Academic Management System
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+package "Client Layer" {
+  component "Web Browser" as Browser
+  component "Angular Frontend\n(TypeScript)" as Angular
+  component "Generated API Client\n(OpenAPI / Swagger)" as ApiClient
+}
+
+package "Application Layer" {
+  component "ASP.NET Core API\n(C#)" as Api
+  component "Authentication & Authorization\n(JWT, Roles, Permissions)" as Auth
+  component "Business Logic\n(Enrollment, Catalog, Users)" as Logic
+}
+
+package "Data Layer" {
+  database "PostgreSQL\n(Relational Database)" as DB
+  component "Entity Framework Core\n(ORM)" as EF
+}
+
+package "Development & Tooling" {
+  component "Postman\n(API testing)"
+  component "Rider\n(C# backend IDE)"
+  component "IntelliJ IDEA\n(Frontend / general dev)"
+  component "Git & GitHub\n(Version control)"
+  component "Figma\n(UI/UX design)"
+  component "Notion\n(Planning & documentation)"
+}
+
+Browser --> Angular
+Angular --> ApiClient : Generated from OpenAPI
+ApiClient --> Api : HTTPS / JSON
+
+Api --> Auth
+Api --> Logic
+Logic --> EF
+EF --> DB
+
+@enduml

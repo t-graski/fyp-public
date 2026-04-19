@@ -1,0 +1,25 @@
+﻿<div class="dialog-backdrop" (click)="cancel()">
+  <div class="dialog" (click)="$event.stopPropagation()">
+
+    <div class="dialog-icon-wrap" [class.danger]="options.danger">
+      <mat-icon [fontIcon]="options.icon ?? (options.danger ? 'warning' : 'help_outline')"></mat-icon>
+    </div>
+
+    <div class="dialog-body">
+      <h3 class="dialog-title">{{ options.title ?? 'Are you sure?' }}</h3>
+      @if (options.message) {
+        <p class="dialog-message">{{ options.message }}</p>
+      }
+    </div>
+
+    <div class="dialog-actions">
+      <button class="dialog-btn cancel" (click)="cancel()">
+        {{ options.cancelLabel ?? 'Cancel' }}
+      </button>
+      <button class="dialog-btn confirm" [class.danger]="options.danger" (click)="confirm()">
+        {{ options.confirmLabel ?? 'Confirm' }}
+      </button>
+    </div>
+
+  </div>
+</div>

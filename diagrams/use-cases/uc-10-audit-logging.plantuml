@@ -1,0 +1,23 @@
+﻿@startuml
+title UC-FR-10 Audit Logging
+left to right direction
+
+actor "Administrator" as Admin
+actor "System" as System
+
+rectangle "Academic Management System" {
+  (Record Audit Event) as Record
+  (Query Audit Log) as Query
+  (Filter Audit Results) as Filter
+}
+
+System -- Record
+Admin -- Query
+Filter ..> Query : <<include>>
+
+note right of Record
+Includes: actor, timestamp, action,
+entity, and changes
+end note
+
+@enduml

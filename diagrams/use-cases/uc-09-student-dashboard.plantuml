@@ -1,0 +1,23 @@
+﻿@startuml
+title UC-FR-09 Student Dashboard
+left to right direction
+
+actor "Student" as Student
+
+rectangle "Academic Management System" {
+  (View Dashboard) as Dash
+  (View Course Enrollment Summary) as Course
+  (View Modules Summary) as Modules
+  (Filter Modules) as Filter
+}
+
+Student -- Dash
+Dash ..> Course : <<include>>
+Dash ..> Modules : <<include>>
+Filter ..> Dash : <<extend>>
+
+note right of Filter
+Filter by module name and year
+end note
+
+@enduml

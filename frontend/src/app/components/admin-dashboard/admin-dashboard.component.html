@@ -1,0 +1,163 @@
+<div class="admin-dashboard">
+
+  <div class="admin-container">
+    <aside class="sidebar">
+      <h3>Settings</h3>
+      <nav class="sidebar-nav">
+        @if (permissionService.$canReadUser() || permissionService.isSuperAdmin()) {
+          <button
+            class="sidebar-item"
+            [class.sidebar-item--active]="$activeTab() === 'users'"
+            (click)="setView('users')">
+            <mat-icon fontIcon="people"></mat-icon>
+            <span>Users</span>
+          </button>
+        }
+        @if (permissionService.$canReadCatalog() || permissionService.isSuperAdmin()) {
+          <button
+            class="sidebar-item"
+            [class.sidebar-item--active]="$activeTab() === 'courses'"
+            (click)="setView('courses')">
+            <mat-icon fontIcon="school"></mat-icon>
+            <span>Courses</span>
+          </button>
+        }
+        @if (permissionService.$canReadCatalog() || permissionService.isSuperAdmin()) {
+          <button
+            class="sidebar-item"
+            [class.sidebar-item--active]="$activeTab() === 'modules'"
+            (click)="setView('modules')">
+            <mat-icon fontIcon="menu_book"></mat-icon>
+            <span>Modules</span>
+          </button>
+        }
+        @if (permissionService.$canReadRole() || permissionService.isSuperAdmin()) {
+          <button
+            class="sidebar-item"
+            [class.sidebar-item--active]="$activeTab() === 'roles'"
+            (click)="setView('roles')">
+            <mat-icon fontIcon="admin_panel_settings"></mat-icon>
+            <span>Roles</span>
+          </button>
+        }
+        @if (permissionService.$canReadUser() || permissionService.isSuperAdmin()) {
+          <button
+            class="sidebar-item"
+            [class.sidebar-item--active]="$activeTab() === 'student-records'"
+            (click)="setView('student-records')">
+            <mat-icon fontIcon="badge"></mat-icon>
+            <span>Student Records</span>
+          </button>
+        }
+
+        @if (permissionService.$canWriteEnrollment()
+        || permissionService.isSuperAdmin()) {
+          <div class="sidebar-divider"></div>
+        }
+
+        @if (permissionService.$canWriteEnrollment() || permissionService.isSuperAdmin()) {
+          <button
+            class="sidebar-item"
+            [class.sidebar-item--active]="$activeTab() === 'course-enroll'"
+            (click)="setView('course-enroll')">
+            <mat-icon fontIcon="person_add"></mat-icon>
+            <span>Add to Courses</span>
+          </button>
+        }
+        @if (permissionService.$canWriteEnrollment() || permissionService.isSuperAdmin()) {
+          <button
+            class="sidebar-item"
+            [class.sidebar-item--active]="$activeTab() === 'module-enroll'"
+            (click)="setView('module-enroll')">
+            <mat-icon fontIcon="playlist_add"></mat-icon>
+            <span>Add to Modules</span>
+          </button>
+        }
+
+        @if (permissionService.$canReadAudit() || permissionService.isSuperAdmin()) {
+          <div class="sidebar-divider"></div>
+        }
+
+        @if (permissionService.$canReadAudit() || permissionService.isSuperAdmin()) {
+          <button
+            class="sidebar-item"
+            [class.sidebar-item--active]="$activeTab() === 'log'"
+            (click)="setView('log')">
+            <mat-icon fontIcon="history"></mat-icon>
+            <span>Audit Log</span>
+          </button>
+        }
+        @if (permissionService.$canReadAudit() || permissionService.isSuperAdmin()) {
+          <button
+            class="sidebar-item"
+            [class.sidebar-item--active]="$activeTab() === 'user-history'"
+            (click)="setView('user-history')">
+            <mat-icon fontIcon="login"></mat-icon>
+            <span>Login History</span>
+          </button>
+        }
+      </nav>
+    </aside>
+
+    <main class="content">
+      @if ($isLoading()) {
+        <div class="loading">
+          <p>Loading...</p>
+        </div>
+      } @else {
+        @if ($activeTab() === 'users') {
+          <app-admin-users-tab
+            ($viewEnrollments)="handleViewUserEnrollments($event)"
+          ></app-admin-users-tab>
+        }
+        @if ($activeTab() === 'courses') {
+          <app-admin-courses-tab
+            ($viewEnrollments)="handleViewCourseEnrollments($event)"
+          ></app-admin-courses-tab>
+        }
+        @if ($activeTab() === 'modules') {
+          <app-admin-modules-tab
+            [$courses]="$courses()"
+            (viewEnrollments)="handleViewModuleEnrollments($event)"
+          ></app-admin-modules-tab>
+        }
+        @if ($activeTab() === 'roles') {
+          <app-admin-roles-tab></app-admin-roles-tab>
+        }
+        @if ($activeTab() === 'student-records') {
+          <app-admin-student-records-tab></app-admin-student-records-tab>
+        }
+        @if ($activeTab() === 'course-enroll') {
+          <app-admin-enroll-course-tab
+            [$users]="$users()"
+            [$courses]="$courses()"
+            [$isLoading]="$isLoading()"
+          ></app-admin-enroll-course-tab>
+        }
+        @if ($activeTab() === 'module-enroll') {
+          <app-admin-enroll-module-tab
+            [$users]="$users()"
+            [$courses]="$courses()"
+            [$isLoading]="$isLoading()"
+          ></app-admin-enroll-module-tab>
+        }
+        @if ($activeTab() === 'log') {
+          <app-admin-audit-tab></app-admin-audit-tab>
+        }
+        @if ($activeTab() === 'user-history') {
+          <app-admin-login-audit-tab></app-admin-login-audit-tab>
+        }
+      }
+    </main>
+  </div>
+
+  @if ($showEnrollmentDetails()) {
+    <app-enrollment-details
+      [$mode]="$enrollmentDetailsMode()"
+      [$entityId]="$enrollmentDetailsEntityId()"
+      [$entityName]="$enrollmentDetailsEntityName()"
+      (close)="closeEnrollmentDetails()"
+      (enrollStudents)="handleEnrollStudents($event)"
+    ></app-enrollment-details>
+  }
+</div>

@@ -1,0 +1,22 @@
+﻿@startuml
+title UC-FR-15 Secure Session Termination
+left to right direction
+
+actor "Authenticated User" as User
+
+rectangle "Academic Management System" {
+  (Log Out) as Logout
+  (Invalidate Session Token) as Invalidate
+  (Deny Requests With Old Token) as Deny
+}
+
+User -- Logout
+Logout ..> Invalidate : <<include>>
+Deny ..> Logout : <<extend>>
+
+note right of Deny
+Triggered when requests are made using
+an expired/terminated token
+end note
+
+@enduml

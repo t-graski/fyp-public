@@ -1,0 +1,100 @@
+<div class="dashboard">
+  @if ($dashboardData(); as data) {
+
+    <div class="dashboard-content">
+      @if (data.enrolledCourse; as course) {
+        <div class="course-card-wrapper">
+          <div class="course-card-header">
+            <h2>{{ course.title }} ({{ course.courseCode }})</h2>
+          </div>
+          <div class="course-card-body">
+            <p>Year {{ course.yearOfStudy }} - Semester {{ course.semester }}</p>
+          </div>
+        </div>
+      }
+
+      <div class="action-buttons">
+        <button class="action-button" (click)="navigateToAttendance()">
+          <mat-icon fontIcon="how_to_reg"></mat-icon>
+          <span>Attendance Management</span>
+        </button>
+      </div>
+
+      <app-card>
+        <div class="modules-container">
+          <div class="modules-header">
+            <div class="modules-title">
+              <mat-icon fontIcon="menu_book"></mat-icon>
+              <h3>Current Modules</h3>
+            </div>
+            <div class="search-wrapper">
+              <mat-icon fontIcon="search"></mat-icon>
+              <input
+                type="text"
+                placeholder="Search modules..."
+                [value]="$searchQuery()"
+                (input)="onSearchChange($any($event.target).value)"
+              />
+            </div>
+          </div>
+
+          <div class="modules-list">
+            @for (module of $filteredCurrentModules(); track module.moduleId) {
+              <div class="module-item" (click)="onModuleClick(module)">
+                <div class="module-info">
+                  <h4>{{ module.title }}</h4>
+                  <p class="module-code">{{ module.moduleCode }}</p>
+                </div>
+                <mat-icon fontIcon="chevron_right"></mat-icon>
+              </div>
+            } @empty {
+              <p class="no-modules">
+                {{ $searchQuery() ? 'No modules found matching your search' : 'No current modules enrolled' }}
+              </p>
+            }
+          </div>
+        </div>
+      </app-card>
+
+      @if (data.pastModules && data.pastModules.length > 0) {
+        <button class="toggle-button" (click)="togglePreviousModules()">
+          {{ $showPreviousModules() ? 'Hide Previous Modules' : 'Show Previous Modules' }}
+        </button>
+
+        @if ($showPreviousModules()) {
+          <app-card>
+            <div class="modules-container">
+              <div class="modules-header">
+                <div class="modules-title">
+                  <mat-icon fontIcon="history"></mat-icon>
+                  <h3>Previous Modules</h3>
+                </div>
+              </div>
+
+              <div class="modules-list">
+                @for (module of data.pastModules; track module.moduleId) {
+                  <div class="module-item module-item--past" (click)="onModuleClick(module)">
+                    <div class="module-info">
+                      <h4>{{ module.title }}</h4>
+                      <p class="module-code">{{ module.moduleCode }}</p>
+                    </div>
+                    <mat-icon fontIcon="chevron_right"></mat-icon>
+                  </div>
+                }
+              </div>
+            </div>
+          </app-card>
+        }
+      }
+    </div>
+  } @else if ($isLoading()) {
+    <div class="loading">
+      <p>Loading dashboard...</p>
+    </div>
+  } @else {
+    <div class="error">
+      <p>Failed to load dashboard. Please try again.</p>
+    </div>
+  }
+</div>
+

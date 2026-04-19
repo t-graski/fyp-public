@@ -1,0 +1,26 @@
+﻿@startuml
+title UC-FR-08 Module Enrollment Management
+left to right direction
+
+actor "Staff (Authorized)" as Staff
+
+rectangle "Academic Management System" {
+  (Enroll Student in Module) as Enroll
+  (Validate Module Enrollment Rules) as Validate
+  (Reject Module Enrollment) as Reject
+}
+
+Staff -- Enroll
+Enroll ..> Validate : <<include>>
+Reject ..> Enroll : <<extend>>
+
+note top of Validate
+Rules include:
+- student exists
+- module exists
+- active course enrollment exists
+- module belongs to enrolled course
+- no duplicate enrollment for term
+end note
+
+@enduml

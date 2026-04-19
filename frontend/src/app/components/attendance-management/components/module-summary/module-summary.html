@@ -1,0 +1,37 @@
+<app-card [clickable]="false" class="module-summary-container">
+  <div class="module-content">
+    <h2 class="section-title">Module Attendance</h2>
+
+    <div class="modules-grid">
+      @for (module of $modules(); track module.moduleId) {
+        <app-card [clickable]="false" class="module-card">
+          <div class="module-header">
+            <h3 class="module-name">{{ module.moduleName }}</h3>
+            <span class="module-day">{{ getDayLabel(module.scheduledDay ?? 0) }}</span>
+          </div>
+
+          <div class="module-period">
+            {{ module.runsFrom | date: 'MMM d' }} - {{ module.runsTo | date: 'MMM d, yyyy' }}
+          </div>
+
+          <div class="module-stats">
+            <div class="sessions-count">
+              <span class="count-label">Sessions:</span>
+              <span class="count-value">{{ module.attendedSessions ?? 0 }} / {{ module.expectedSessions ?? 0 }}</span>
+            </div>
+
+            <div class="attendance-percent" [style.color]="((module.attendancePercent ?? 0) * 100) | attendanceColor">
+              {{ (module.attendancePercent ?? 0) * 100 | number: '1.1-1' }}%
+            </div>
+          </div>
+
+          <app-progress-bar
+            [value]="(module.attendancePercent ?? 0) * 100"
+            [showValue]="false"
+            [color]="((module.attendancePercent ?? 0) * 100) | attendanceColor"
+          ></app-progress-bar>
+        </app-card>
+      }
+    </div>
+  </div>
+</app-card>

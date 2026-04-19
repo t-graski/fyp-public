@@ -1,0 +1,100 @@
+﻿<div class="profile-grades-tab">
+  @if ($isLoading()) {
+    <div class="grades-loading">
+      <mat-icon fontIcon="hourglass_empty" class="spinning"></mat-icon>
+      <p>Loading grades...</p>
+    </div>
+  } @else if ($modules().length === 0) {
+    <div class="grades-empty">
+      <div class="grades-empty-icon">
+        <mat-icon fontIcon="grade"></mat-icon>
+      </div>
+      <h3>No Grades Yet</h3>
+      <p>Your assessment grades will appear here once they have been submitted.</p>
+    </div>
+  } @else {
+    <div class="grades-content">
+      <div class="modules-list">
+        @for (module of $modules(); track module.moduleId) {
+          <div class="module-card" [class.is-expanded]="isExpanded(module.moduleId!)">
+
+            <button class="module-header" (click)="toggleModule(module.moduleId!)">
+              <div class="module-header-grid">
+                <div class="module-field module-field--name">
+                  <span class="field-label">Module</span>
+                  <span class="field-value field-value--name">{{ module.title }}</span>
+                </div>
+                <div class="module-field">
+                  <span class="field-label">Code</span>
+                  <span class="field-value">{{ module.moduleCode }}</span>
+                </div>
+                <div class="module-field">
+                  <span class="field-label">Level</span>
+                  <span class="field-value">{{ module.level }}</span>
+                </div>
+                <div class="module-field">
+                  <span class="field-label">Credits</span>
+                  <span class="field-value">{{ module.credits }}</span>
+                </div>
+                <div class="module-field">
+                  <span class="field-label">Type</span>
+                  <span class="field-value"
+                        [class.value-core]="isCore(module)"
+                        [class.value-elective]="!isCore(module)">
+                    {{ isCore(module) ? 'Core' : 'Elective' }}
+                  </span>
+                </div>
+              </div>
+              <div class="module-right">
+                @if (moduleAverage(module) !== null) {
+                  <span class="module-avg" [style.color]="getGradeColor(moduleAverage(module)!)">
+                    {{ moduleAverage(module)! | number:'1.1-1' }}%
+                  </span>
+                  <span class="module-avg-badge"
+                        [style.background]="getGradeColor(moduleAverage(module)!) + '22'"
+                        [style.color]="getGradeColor(moduleAverage(module)!)">
+                    {{ getGradeLabel(moduleAverage(module)!) }}
+                  </span>
+                } @else {
+                  <span class="no-grade-text">No grades</span>
+                }
+                <mat-icon class="expand-icon" [class.rotated]="isExpanded(module.moduleId!)">expand_more</mat-icon>
+              </div>
+            </button>
+
+            @if (isExpanded(module.moduleId!)) {
+              <div class="assessments-list">
+                @if (!module.assessments || module.assessments.length === 0) {
+                  <div class="assessments-empty">No assessments recorded.</div>
+                } @else {
+                  <div class="assessments-grid">
+                    <div class="assessments-grid-header">
+                      <span>Assessment</span>
+                      <span>Weight</span>
+                      <span>Grade</span>
+                      <span>Result</span>
+                    </div>
+                    @for (a of module.assessments; track a.assessmentElementId; let i = $index) {
+                      <div class="assessments-grid-row">
+                        <span class="assessment-name">Assessment {{ i + 1 }}</span>
+                        <span class="assessment-cell">{{ a.weight }}%</span>
+                        <span class="assessment-cell assessment-grade"
+                              [style.color]="a.grade !== undefined ? getGradeColor(a.grade) : null">
+                          {{ a.grade !== undefined ? a.grade : '—' }}
+                        </span>
+                        <span class="assessment-badge"
+                              [style.color]="a.grade !== undefined ? getGradeColor(a.grade) : null">
+                          {{ a.grade !== undefined ? getGradeLabel(a.grade) : '—' }}
+                        </span>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,112 @@
+<div class="attendance-page">
+  <div class="attendance-header">
+    <div class="attendance-header-inner">
+      <button class="back-button" (click)="goBack()">
+        <mat-icon fontIcon="arrow_back"></mat-icon>
+        <span>Back</span>
+      </button>
+      <div class="header-divider"></div>
+      <div class="header-title-row">
+        <h1>My Attendance</h1>
+      </div>
+    </div>
+  </div>
+
+  <div class="attendance-content">
+    <div class="filter-section">
+      <app-card [clickable]="false">
+        <div class="filter-content">
+          <div class="filter-header">
+            <mat-icon>date_range</mat-icon>
+            <span>Filter by Date Range</span>
+          </div>
+          <app-date-range-picker [($dateRange)]="$dateRange"></app-date-range-picker>
+        </div>
+      </app-card>
+    </div>
+
+    @if ($isLoading()) {
+      <div class="state-card">
+        <app-card [clickable]="false">
+          <div class="loading-state">
+            <div class="loading-spinner">
+              <mat-icon>hourglass_empty</mat-icon>
+            </div>
+            <p class="state-message">Loading your attendance data...</p>
+          </div>
+        </app-card>
+      </div>
+    }
+
+    @if ($error() && !$isLoading()) {
+      <div class="state-card">
+        <app-card [clickable]="false">
+          <div class="error-state">
+            <mat-icon class="error-icon">error_outline</mat-icon>
+            <p class="state-message">{{ $error() }}</p>
+            <button class="retry-button" (click)="loadAttendanceData($dateRange(), $currentPage())">
+              <mat-icon>refresh</mat-icon>
+              Try Again
+            </button>
+          </div>
+        </app-card>
+      </div>
+    }
+
+    @if (!$isLoading() && !$error() && $overview()) {
+      <div class="overview-section">
+        <app-attendance-overview [$overview]="$overview()!"></app-attendance-overview>
+      </div>
+      @if ($modules().length > 0) {
+        <div class="modules-section">
+          <app-module-summary [$modules]="$modules()"></app-module-summary>
+        </div>
+      }
+      <div class="daily-section">
+        <app-daily-attendance [$days]="$days()"></app-daily-attendance>
+      </div>
+      @if ($totalDays() > $pageSize()) {
+        <div class="pagination-section">
+          <app-card [clickable]="false">
+            <div class="pagination-container">
+              <button
+                class="pagination-button"
+                [disabled]="$currentPage() === 1 || $isLoading()"
+                (click)="loadPreviousPage()"
+              >
+                <mat-icon>chevron_left</mat-icon>
+                <span>Previous</span>
+              </button>
+
+              <div class="pagination-info">
+                <span class="page-indicator">Page {{ $currentPage() }} of {{ $totalPages() }}</span>
+                <span class="total-items">{{ $totalDays() }} total days</span>
+              </div>
+
+              <button
+                class="pagination-button"
+                [disabled]="!$hasMorePages() || $isLoading()"
+                (click)="loadNextPage()"
+              >
+                <span>Next</span>
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+            </div>
+          </app-card>
+        </div>
+      }
+    }
+
+    @if (!$isLoading() && !$error() && !$overview()) {
+      <div class="state-card">
+        <app-card [clickable]="false">
+          <div class="empty-state">
+            <mat-icon class="empty-icon">event_note</mat-icon>
+            <p class="state-message">No attendance data available for this period</p>
+            <p class="state-hint">Try selecting a different date range</p>
+          </div>
+        </app-card>
+      </div>
+    }
+  </div>
+</div>

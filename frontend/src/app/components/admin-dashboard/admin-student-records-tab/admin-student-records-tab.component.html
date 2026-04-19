@@ -1,0 +1,215 @@
+﻿<div class="view-container">
+  <div class="view-header">
+    <h2>Student Records</h2>
+  </div>
+
+  <app-dynamic-table
+    [$data]="$students()"
+    [$columns]="userColumns"
+    [$actions]="[]"
+    [$loading]="$isLoading()"
+    [$searchPlaceholder]="'Search students by name, email or student number...'"
+    [$emptyMessage]="'No students found'"
+    ($reload)="loadUsers()"
+    ($rowClick)="openRecord($event.id!)"
+  ></app-dynamic-table>
+</div>
+
+@if ($selectedUserId()) {
+  <div class="modal-overlay" (click)="closeRecord()">
+    <div class="modal-content modal-content--wide" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <mat-icon fontIcon="badge" class="modal-title-icon"></mat-icon>
+          <h3>Student Record</h3>
+        </div>
+        <button class="modal-close" (click)="closeRecord()">
+          <mat-icon fontIcon="close"></mat-icon>
+        </button>
+      </div>
+
+      @if ($detailLoading()) {
+        <div class="modal-body">
+          <div class="section-loading">
+            <mat-icon fontIcon="hourglass_empty" class="spinning"></mat-icon>
+            <p>Loading...</p>
+          </div>
+        </div>
+      } @else if ($userDetail()) {
+        <div class="modal-body">
+
+          <div class="record-section">
+            <div class="section-header">
+              <mat-icon fontIcon="person"></mat-icon>
+              <h4>User Information</h4>
+              <span class="section-note">Edit in the Users tab</span>
+            </div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">First Name</span>
+                <span class="info-value">{{ $userDetail()!.firstName || '-' }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Last Name</span>
+                <span class="info-value">{{ $userDetail()!.lastName || '-' }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">University Email</span>
+                <span class="info-value">{{ $userDetail()!.email || '-' }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Student Number</span>
+                <span class="info-value">{{ $userDetail()!.student?.studentNumber || '-' }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Status</span>
+                <span class="info-value">
+                  <span class="status-badge" [class.status-badge--active]="$userDetail()!.isActive"
+                        [class.status-badge--inactive]="!$userDetail()!.isActive">
+                    {{ $userDetail()!.isActive ? 'Active' : 'Inactive' }}
+                  </span>
+                </span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Account Created</span>
+                <span class="info-value">{{ $userDetail()!.createdAtUtc | date:'dd MMM yyyy' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="record-section">
+            <div class="section-header">
+              <mat-icon fontIcon="folder_shared"></mat-icon>
+              <h4>Student Record</h4>
+              @if (!$editing()) {
+                <div class="section-actions">
+                  <button *appHasPermission="'UserWrite'" class="action-btn-toolbar action-btn-toolbar--primary"
+                          (click)="startEdit()">
+                    <mat-icon [fontIcon]="$userDetail()!.studentRecord ? 'edit' : 'add'"></mat-icon>
+                    <span>{{ $userDetail()!.studentRecord ? 'Edit' : 'Create Record' }}</span>
+                  </button>
+                  @if ($userDetail()!.studentRecord) {
+                    <button *appHasPermission="'UserWrite'" class="action-btn-toolbar action-btn-toolbar--danger"
+                            (click)="deleteRecord()">
+                      <mat-icon fontIcon="delete"></mat-icon>
+                      <span>Delete</span>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+
+            @if (!$editing()) {
+              @if ($userDetail()!.studentRecord) {
+                <div class="info-grid">
+                  <div class="info-item">
+                    <span class="info-label">Personal Email</span>
+                    <span class="info-value">{{ $userDetail()!.studentRecord!.personalEmail || '-' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Phone Number</span>
+                    <span class="info-value">{{ $userDetail()!.studentRecord!.phoneNumber || '-' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Gender</span>
+                    <span class="info-value">{{ $userDetail()!.studentRecord!.gender || '-' }}</span>
+                  </div>
+                  <div class="info-item info-item--full">
+                    <span class="info-label">Home Address</span>
+                    <span class="info-value">{{ $userDetail()!.studentRecord!.homeAddress || '-' }}</span>
+                  </div>
+                  <div class="info-item info-item--full">
+                    <span class="info-label">Entry Qualifications</span>
+                    <div class="info-value">
+                      @if ($userDetail()!.studentRecord!.entryQualifications?.length) {
+                        <div class="tag-list">
+                          @for (q of $userDetail()!.studentRecord!.entryQualifications!; track q) {
+                            <span class="tag">{{ q }}</span>
+                          }
+                        </div>
+                      } @else {
+                        <span>—</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+              } @else {
+                <div class="empty-record">
+                  <mat-icon fontIcon="folder_open"></mat-icon>
+                  <p>No student record exists for this student yet.</p>
+                </div>
+              }
+
+            } @else {
+              <div class="edit-form">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Personal Email</label>
+                    <input type="email" [ngModel]="$form().personalEmail"
+                           (ngModelChange)="setFormField('personalEmail', $event)"
+                           placeholder="Personal email address">
+                  </div>
+                  <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" [ngModel]="$form().phoneNumber"
+                           (ngModelChange)="setFormField('phoneNumber', $event)"
+                           placeholder="Phone number">
+                  </div>
+                  <div class="form-group">
+                    <label>Gender</label>
+                    <input type="text" [ngModel]="$form().gender"
+                           (ngModelChange)="setFormField('gender', $event)"
+                           placeholder="e.g. Male, Female">
+                  </div>
+                  <div class="form-group form-group--full">
+                    <label>Home Address</label>
+                    <textarea [ngModel]="$form().homeAddress"
+                              (ngModelChange)="setFormField('homeAddress', $event)"
+                              placeholder="Home address" rows="2"></textarea>
+                  </div>
+                  <div class="form-group form-group--full">
+                    <label>Entry Qualifications</label>
+                    <div class="qualification-input">
+                      <input type="text" [ngModel]="$qualificationInput()"
+                             (ngModelChange)="$qualificationInput.set($event)"
+                             (keydown.enter)="addQualification()"
+                             placeholder="Type a qualification and press Enter">
+                      <button class="action-btn-toolbar" (click)="addQualification()">
+                        <mat-icon fontIcon="add"></mat-icon>
+                        <span>Add</span>
+                      </button>
+                    </div>
+                    @if ($form().entryQualifications?.length) {
+                      <div class="tag-list tag-list--editable">
+                        @for (q of $form().entryQualifications!; track q; let i = $index) {
+                          <span class="tag">
+                            {{ q }}
+                            <button class="tag-remove" (click)="removeQualification(i)">
+                              <mat-icon fontIcon="close"></mat-icon>
+                            </button>
+                          </span>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          @if ($editing()) {
+            <button class="btn-cancel" (click)="cancelEdit()">Cancel</button>
+            <button class="btn-primary" (click)="saveRecord()" [disabled]="$saving()">
+              {{ $saving() ? 'Saving...' : 'Save Record' }}
+            </button>
+          } @else {
+            <button class="btn-cancel" (click)="closeRecord()">Close</button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}

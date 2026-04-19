@@ -1,0 +1,368 @@
+<div class="view-container">
+  <div class="view-header">
+    <h2>Roles Management</h2>
+    <button *appHasPermission="'RoleWrite'"
+            class="action-btn-toolbar action-btn-toolbar--primary"
+            (click)="openCreateRoleModal()" title="Add new role">
+      <mat-icon fontIcon="add"></mat-icon>
+      <span>Add Role</span>
+    </button>
+  </div>
+
+  <app-dynamic-table
+    [$data]="$roles()"
+    [$columns]="roleColumns"
+    [$actions]="roleActions"
+    [$loading]="$isLoading()"
+    [$searchPlaceholder]="'Search role by name...'"
+    [$emptyMessage]="'No roles found'"
+    ($reload)="reloadRoles()"
+  ></app-dynamic-table>
+</div>
+
+<!-- Create Role Modal -->
+@if ($showCreateRoleModal()) {
+  <div class="modal-overlay" (click)="closeCreateRoleModal()">
+    <div class="modal-content modal-content--large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Create New Role</h3>
+        <button class="modal-close" (click)="closeCreateRoleModal()">
+          <mat-icon fontIcon="close"></mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="roleName">Role Name</label>
+          <input
+            type="text"
+            id="roleName"
+            [(ngModel)]="$newRole().name"
+            placeholder="Enter role name (e.g., 'Lecturer', 'Department Admin')">
+        </div>
+
+        <div class="form-group">
+          <div class="permissions-header">
+            <label>Permissions</label>
+          </div>
+
+          <div class="permissions-grid">
+            @for (permission of $newRole().permissions; track permission.value) {
+              <label class="permission-checkbox">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="permission.checked">
+                <div class="permission-info">
+                  <span class="permission-name">{{ permission.key }}</span>
+                  <span class="permission-description">{{ permission.description }}</span>
+                </div>
+              </label>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeCreateRoleModal()">Cancel</button>
+        <button class="btn-primary" (click)="createRole()">Create Role</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Edit Role Modal -->
+@if ($showEditRoleModal()) {
+  <div class="modal-overlay" (click)="closeEditRoleModal()">
+    <div class="modal-content modal-content--large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Edit Role</h3>
+        <button class="modal-close" (click)="closeEditRoleModal()">
+          <mat-icon fontIcon="close"></mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="editRoleName">Role Name</label>
+          <input
+            type="text"
+            id="editRoleName"
+            [(ngModel)]="$editRole().name"
+            placeholder="Enter role name">
+        </div>
+
+        <div class="form-group">
+          <div class="permissions-header">
+            <label>Permissions</label>
+            <div class="permissions-actions">
+              <button type="button" class="btn-text" (click)="toggleAllPermissionsEdit(true)">Select All</button>
+              <button type="button" class="btn-text" (click)="toggleAllPermissionsEdit(false)">Deselect All</button>
+            </div>
+          </div>
+
+          <div class="permissions-grid">
+            @for (permission of $editRole().permissions; track permission.value) {
+              <label class="permission-checkbox">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="permission.checked">
+                <div class="permission-info">
+                  <span class="permission-name">{{ permission.key }}</span>
+                  <span class="permission-description">{{ permission.description }}</span>
+                </div>
+              </label>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeEditRoleModal()">Cancel</button>
+        <button class="btn-primary" (click)="updateRole()">Update Role</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Role Details Modal -->
+@if ($showRoleDetails()) {
+  <div class="modal-overlay" (click)="closeRoleDetails()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Role Details</h3>
+        <button class="modal-close" (click)="closeRoleDetails()">
+          <mat-icon fontIcon="close"></mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        @for (role of $roles(); track role.id) {
+          @if (role.id === $showRoleDetails()) {
+            @let permDetails = getPermissionDetails(role.permissions || 0);
+
+            <div class="detail-row">
+              <span class="detail-label">Role ID:</span>
+              <span class="detail-value">{{ role.id }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Name:</span>
+              <span class="detail-value">{{ role.name }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Permission Value:</span>
+              <span class="detail-value">{{ role.permissions }}</span>
+            </div>
+            <div class="detail-row detail-row--column">
+              <span class="detail-label">Permissions:</span>
+              <div class="detail-value">
+                <div class="permissions-detail-list">
+                  @for (perm of permDetails; track perm.key) {
+                    <div class="permission-detail-item">
+                      <span class="permission-detail-name">{{ perm.key }}</span>
+                    </div>
+                  }
+                  @if (permDetails.length === 0) {
+                    <span class="no-permissions">No permissions assigned</span>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeRoleDetails()">Close</button>
+      </div>
+    </div>
+  </div>
+}
+
+
+<!--@if ($showCreateUserModal()) {-->
+<!--  <div class="modal-overlay" (click)="closeCreateUserModal()">-->
+<!--    <div class="modal-content" (click)="$event.stopPropagation()">-->
+<!--      <div class="modal-header">-->
+<!--        <h3>Create New User</h3>-->
+<!--        <button class="modal-close" (click)="closeCreateUserModal()">-->
+<!--          <mat-icon fontIcon="close"></mat-icon>-->
+<!--        </button>-->
+<!--      </div>-->
+
+<!--      <div class="modal-body">-->
+<!--        <div class="form-group">-->
+<!--          <label for="firstName">First Name</label>-->
+<!--          <input-->
+<!--            type="text"-->
+<!--            id="firstName"-->
+<!--            [(ngModel)]="$newUser().firstName"-->
+<!--            placeholder="Enter first name">-->
+<!--        </div>-->
+
+<!--        <div class="form-group">-->
+<!--          <label for="lastName">Last Name</label>-->
+<!--          <input-->
+<!--            type="text"-->
+<!--            id="lastName"-->
+<!--            [(ngModel)]="$newUser().lastName"-->
+<!--            placeholder="Enter last name">-->
+<!--        </div>-->
+
+<!--        <div class="form-group">-->
+<!--          <label for="email">Email</label>-->
+<!--          <input-->
+<!--            type="email"-->
+<!--            id="email"-->
+<!--            [(ngModel)]="$newUser().email"-->
+<!--            placeholder="Enter email">-->
+<!--        </div>-->
+
+<!--        <div class="form-group">-->
+<!--          <label for="password">Password</label>-->
+<!--          <input-->
+<!--            type="password"-->
+<!--            id="password"-->
+<!--            [(ngModel)]="$newUser().password"-->
+<!--            placeholder="Enter password">-->
+<!--        </div>-->
+
+<!--        <div class="form-group">-->
+<!--          <label for="systemRole">Role</label>-->
+<!--          <select id="systemRole" [(ngModel)]="$newUser().systemRole">-->
+<!--            <option [ngValue]="null">No role</option>-->
+<!--            @if (roleService.$rolesLoaded()) {-->
+<!--              @for (role of roleService.$roles(); track role.id) {-->
+<!--                <option [ngValue]="role.id">{{ role.name }}</option>-->
+<!--              }-->
+<!--            }-->
+<!--          </select>-->
+<!--        </div>-->
+
+<!--        <div class="form-group checkbox-group">-->
+<!--          <label>-->
+<!--            <input type="checkbox" [(ngModel)]="$newUser().isActive">-->
+<!--            <span>Active</span>-->
+<!--          </label>-->
+<!--        </div>-->
+<!--      </div>-->
+
+<!--      <div class="modal-footer">-->
+<!--        <button class="btn-cancel" (click)="closeCreateUserModal()">Cancel</button>-->
+<!--        <button class="btn-primary" (click)="createUser()">Create User</button>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--}-->
+
+<!--@if ($showUserDetails()) {-->
+<!--  <div class="modal-overlay" (click)="closeUserDetails()">-->
+<!--    <div class="modal-content" (click)="$event.stopPropagation()">-->
+<!--      <div class="modal-header">-->
+<!--        <h3>User Details</h3>-->
+<!--        <button class="modal-close" (click)="closeUserDetails()">-->
+<!--          <mat-icon fontIcon="close"></mat-icon>-->
+<!--        </button>-->
+<!--      </div>-->
+
+<!--      <div class="modal-body">-->
+<!--        @for (user of $users(); track user.id) {-->
+<!--          @if (user.id === $showUserDetails()) {-->
+<!--            <div class="detail-row">-->
+<!--              <span class="detail-label">User ID:</span>-->
+<!--              <span class="detail-value">{{ user.id }}</span>-->
+<!--            </div>-->
+<!--            <div class="detail-row">-->
+<!--              <span class="detail-label">Name:</span>-->
+<!--              <span class="detail-value">{{ user.firstName }} {{ user.lastName }}</span>-->
+<!--            </div>-->
+<!--            <div class="detail-row">-->
+<!--              <span class="detail-label">Email:</span>-->
+<!--              <span class="detail-value">{{ user.email }}</span>-->
+<!--            </div>-->
+<!--            <div class="detail-row">-->
+<!--              <span class="detail-label">Roles:</span>-->
+<!--              <span class="detail-value">{{ getRoleName(user.roles) }}</span>-->
+<!--            </div>-->
+<!--            <div class="detail-row">-->
+<!--              <span class="detail-label">Status:</span>-->
+<!--              <span class="detail-value">-->
+<!--                <span class="status" [class.status&#45;&#45;active]="user.isActive" [class.status&#45;&#45;inactive]="!user.isActive">-->
+<!--                  {{ user.isActive ? 'Active' : 'Inactive' }}-->
+<!--                </span>-->
+<!--              </span>-->
+<!--            </div>-->
+<!--            <div class="detail-row">-->
+<!--              <span class="detail-label">Permissions:</span>-->
+<!--              <span class="detail-value">{{ user.permissions || 'None' }}</span>-->
+<!--            </div>-->
+<!--            @if (user.student) {-->
+<!--              <div class="detail-row">-->
+<!--                <span class="detail-label">Student ID:</span>-->
+<!--                <span class="detail-value">{{ user.student.id }}</span>-->
+<!--              </div>-->
+<!--              <div class="detail-row">-->
+<!--                <span class="detail-label">Student Number:</span>-->
+<!--                <span class="detail-value">{{ user.student.studentNumber || 'N/A' }}</span>-->
+<!--              </div>-->
+<!--            }-->
+<!--          }-->
+<!--        }-->
+<!--      </div>-->
+
+<!--      <div class="modal-footer">-->
+<!--        <button class="btn-cancel" (click)="closeUserDetails()">Close</button>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--}-->
+
+<!--@if ($showAssignRoleModal()) {-->
+<!--  <div class="modal-overlay" (click)="closeAssignRoleModal()">-->
+<!--    <div class="modal-content" (click)="$event.stopPropagation()">-->
+<!--      <div class="modal-header">-->
+<!--        <h3>Assign Role</h3>-->
+<!--        <button class="modal-close" (click)="closeAssignRoleModal()">-->
+<!--          <mat-icon fontIcon="close"></mat-icon>-->
+<!--        </button>-->
+<!--      </div>-->
+
+<!--      <div class="modal-body">-->
+<!--        <div class="form-group">-->
+<!--          <label>Current Roles:</label>-->
+<!--          <div class="current-roles">-->
+<!--            @if ($showAssignRoleModal()!.currentRoles.length === 0) {-->
+<!--              <span class="no-roles">No roles assigned</span>-->
+<!--            } @else {-->
+<!--              @for (role of $showAssignRoleModal()!.currentRoles; track role.id) {-->
+<!--                <span class="role-badge">{{ role.name }}</span>-->
+<!--              }-->
+<!--            }-->
+<!--          </div>-->
+<!--        </div>-->
+
+<!--        <div class="form-group">-->
+<!--          <label for="roleSelect">Available Roles:</label>-->
+<!--          @if (roleService.$rolesLoaded()) {-->
+<!--            <div class="role-list">-->
+<!--              @for (role of roleService.$roles(); track role.id) {-->
+<!--                <button-->
+<!--                  class="role-item"-->
+<!--                  [class.role-item&#45;&#45;assigned]="isRoleAssigned(role.id!)"-->
+<!--                  (click)="assignRole($showAssignRoleModal()!.userId, role.id!)">-->
+<!--                  <mat-icon [fontIcon]="isRoleAssigned(role.id!) ? 'check_circle' : 'add_circle'"></mat-icon>-->
+<!--                  <span>{{ role.name }}</span>-->
+<!--                </button>-->
+<!--              }-->
+<!--            </div>-->
+<!--          } @else {-->
+<!--            <p class="loading-roles">Loading roles...</p>-->
+<!--          }-->
+<!--        </div>-->
+<!--      </div>-->
+
+<!--      <div class="modal-footer">-->
+<!--        <button class="btn-cancel" (click)="closeAssignRoleModal()">Close</button>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--}-->

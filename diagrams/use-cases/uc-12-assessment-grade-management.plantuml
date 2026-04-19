@@ -1,0 +1,23 @@
+﻿@startuml
+title UC-FR-12 Assessment and Grade Management
+left to right direction
+
+actor "Staff" as Staff
+actor "Student" as Student
+
+rectangle "Academic Management System" {
+  (Enter Assessment Marks) as Enter
+  (Calculate Overall Grade) as Calc
+  (View Results) as View
+}
+
+Staff -- Enter
+Enter ..> Calc : <<include>>
+Student -- View
+Staff -- View
+
+note top of Calc
+Uses assessment weights and marks
+end note
+
+@enduml

@@ -1,0 +1,17 @@
+﻿@startuml
+title UC-FR-14 Global Academic Search
+left to right direction
+
+actor "Student/Staff/Admin" as User
+
+rectangle "Academic Management System" {
+  (Search Academic Content) as Search
+  (Search Courses) as Courses
+  (Search Modules) as Modules
+}
+
+User -- Search
+Search ..> Courses : <<include>>
+Search ..> Modules : <<include>>
+
+@enduml

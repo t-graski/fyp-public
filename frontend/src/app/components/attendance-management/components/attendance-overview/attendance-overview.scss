@@ -1,0 +1,48 @@
+@use 'styles' as *;
+
+.overview-content {
+  padding: 24px;
+}
+
+.overview-card {
+  width: 100%;
+}
+
+.overview-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: $neutral-800;
+  margin-bottom: 20px;
+}
+
+.overview-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.stat-card {
+  padding: 16px;
+  background: $neutral-100;
+  border-radius: 8px;
+  border: 1px solid $neutral-300;
+}
+
+.stat-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: $neutral-600;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: $neutral-800;
+  margin-bottom: 8px;
+
+  &.period {
+    font-size: 16px;
+    font-weight: 500;
+  }
+}

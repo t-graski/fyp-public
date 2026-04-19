@@ -1,0 +1,144 @@
+﻿@use 'styles' as *;
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.dialog {
+  background: $neutral-100;
+  border-radius: 20px;
+  padding: 32px;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dialog-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba($brand-400, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    color: $brand-400;
+  }
+
+  &.danger {
+    background: rgba($error-200, 0.1);
+
+    mat-icon {
+      color: $error-200;
+    }
+  }
+}
+
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.dialog-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: $neutral-700;
+}
+
+.dialog-message {
+  font-size: 14px;
+  color: $neutral-500;
+  line-height: 1.6;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.dialog-btn {
+  flex: 1;
+  padding: 11px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: all 0.15s ease;
+
+  &.cancel {
+    background: $neutral-200;
+    color: $neutral-600;
+    border: 1px solid $neutral-300;
+
+    &:hover {
+      background: $neutral-300;
+    }
+  }
+
+  &.confirm {
+    background: linear-gradient(135deg, $brand-400, $brand-500);
+    color: $neutral-100;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba($brand-400, 0.35);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    &.danger {
+      background: linear-gradient(135deg, $error-200, $error-300);
+
+      &:hover {
+        box-shadow: 0 4px 16px rgba($error-200, 0.35);
+      }
+    }
+  }
+}

@@ -1,0 +1,34 @@
+﻿@startuml
+title UC-FR-01 Secure User Authentication
+left to right direction
+
+actor "User" as User
+
+rectangle "Academic Management System" {
+  (Authenticate User) as Auth
+  (Validate Credentials) as Validate
+  (Issue JWT) as Issue
+  (Reject Login) as Reject
+  (Lock Account) as Lock
+}
+
+User -- Auth
+Auth ..> Validate : <<include>>
+Auth ..> Issue : <<include>>
+
+Reject ..> Auth : <<extend>>
+Lock ..> Auth : <<extend>>
+
+note right of Reject
+Triggered when:
+- invalid credentials
+- deactivated account
+- JWT expired for protected access
+end note
+
+note right of Lock
+Triggered when:
+- 5 incorrect passwords within 10 minutes
+end note
+
+@enduml

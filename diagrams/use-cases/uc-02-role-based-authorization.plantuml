@@ -1,0 +1,25 @@
+﻿@startuml
+title UC-FR-02 Role-based Authorization
+left to right direction
+
+actor "Authenticated User" as AU
+
+rectangle "Academic Management System" {
+  (Access Protected Resource) as Access
+  (Validate JWT) as ValidateJWT
+  (Compute Effective Permissions) as Perms
+  (Authorize Request) as Authorize
+  (Deny Access) as Deny
+}
+
+AU -- Access
+Access ..> ValidateJWT : <<include>>
+Access ..> Perms : <<include>>
+Access ..> Authorize : <<include>>
+Deny ..> Access : <<extend>>
+
+note right of Deny
+Triggered when permissions are insufficient
+end note
+
+@enduml

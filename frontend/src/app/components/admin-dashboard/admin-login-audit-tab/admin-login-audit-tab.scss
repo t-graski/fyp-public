@@ -1,0 +1,418 @@
+@use 'styles' as *;
+
+.audit-filters {
+  background: linear-gradient(135deg, $neutral-100 0%, $neutral-200 100%);
+  border: 2px solid $neutral-300;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  .filter-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &--actions {
+      justify-content: flex-end;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: $neutral-600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .filter-input,
+  .filter-select {
+    padding: 12px 14px;
+    border: 2px solid $neutral-300;
+    border-radius: 10px;
+    font-size: 14px;
+    background: $neutral-100;
+    transition: all 0.3s ease;
+    font-family: inherit;
+
+    &:hover {
+      border-color: $brand-300;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $brand-400;
+      box-shadow: 0 0 0 4px rgba($brand-400, 0.15);
+      background: $neutral-100;
+    }
+
+    &::placeholder {
+      color: $neutral-400;
+    }
+  }
+
+  .filter-select {
+    cursor: pointer;
+  }
+}
+
+.audit-events-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.audit-event {
+  display: flex;
+  gap: 14px;
+  padding: 14px 18px;
+  background: $neutral-100;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: transparent;
+    border-radius: 10px 0 0 10px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &:hover {
+    background: linear-gradient(to right, rgba($brand-400, 0.03), $neutral-100);
+    border-color: $neutral-300;
+    transform: translateX(4px);
+
+    &::before {
+      background: $brand-400;
+    }
+  }
+
+  &:active {
+    transform: translateX(2px);
+  }
+}
+
+.audit-event-icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: $neutral-100;
+    position: relative;
+    z-index: 1;
+  }
+
+  &.action-create {
+    background: #10b981;
+  }
+
+  &.action-update {
+    background: #3b82f6;
+  }
+
+  &.action-delete {
+    background: #ef4444;
+  }
+
+  &.action-login {
+    background: #8b5cf6;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
+  }
+}
+
+.audit-event-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.audit-event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.audit-event-action {
+  font-weight: 600;
+  font-size: 13px;
+  color: $neutral-700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.audit-event-time {
+  font-size: 12px;
+  color: $neutral-500;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.audit-event-summary {
+  font-size: 13px;
+  color: $neutral-600;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.audit-event-meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.audit-meta-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: $neutral-200;
+  border-radius: 4px;
+  font-size: 11px;
+  color: $neutral-600;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+// Audit event details modal styles
+.modal-content--large {
+  max-width: 900px;
+}
+
+.audit-details {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.detail-section {
+  h4 {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: $neutral-800;
+    padding-bottom: 12px;
+    border-bottom: 2px solid $brand-400;
+  }
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 12px;
+    font-weight: 600;
+    color: $neutral-600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .detail-value {
+    font-size: 14px;
+    color: $neutral-800;
+    font-family: 'Courier New', monospace;
+    padding: 8px 12px;
+    background: $neutral-200;
+    border-radius: 6px;
+  }
+}
+
+.detail-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &.action-create {
+    background: #10b981;
+  }
+
+  &.action-update {
+    background: #3b82f6;
+  }
+
+  &.action-delete {
+    background: #ef4444;
+  }
+
+  &.action-login {
+    background: #8b5cf6;
+  }
+}
+
+.summary-text {
+  margin: 0;
+  padding: 16px;
+  background: $neutral-200;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: $neutral-800;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 2px solid $neutral-200;
+
+  &--top {
+    border-top: none;
+    border-bottom: 2px solid $neutral-200;
+    margin-bottom: 12px;
+    padding-top: 0;
+  }
+
+  &--bottom {
+    margin-top: 12px;
+  }
+}
+
+.pagination-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pagination-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border: 2px solid $neutral-300;
+  border-radius: 8px;
+  background: $neutral-100;
+  color: $neutral-700;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover:not(:disabled) {
+    background: $brand-400;
+    border-color: $brand-400;
+    color: $neutral-100;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.pagination-info {
+  font-size: 14px;
+  font-weight: 600;
+  color: $neutral-600;
+  min-width: 60px;
+  text-align: center;
+}
+
+.pagination-count {
+  font-size: 13px;
+  color: $neutral-500;
+  font-weight: 500;
+}
+
+.pagination-more {
+  font-size: 12px;
+  color: $neutral-400;
+  font-weight: 400;
+}
+
+.page-size-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    color: $neutral-600;
+    white-space: nowrap;
+  }
+}
+
+.page-size-select {
+  padding: 6px 10px;
+  font-size: 13px;
+  width: auto;
+}

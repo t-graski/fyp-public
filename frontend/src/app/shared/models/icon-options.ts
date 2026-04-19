@@ -1,0 +1,15 @@
+﻿export const ICON_OPTIONS = [
+  {key: '', icon: 'block'},
+  {key: 'widgets', icon: 'widgets'},
+  {key: 'title', icon: 'title'},
+  {key: 'notes', icon: 'notes'},
+  {key: 'link', icon: 'link'},
+  {key: 'assignment', icon: 'assignment'},
+  {key: 'upload_file', icon: 'upload_file'},
+  {key: 'book', icon: 'book'},
+  {key: 'info', icon: 'info'},
+  {key: 'star', icon: 'star'},
+  {key: 'flag', icon: 'flag'},
+  {key: 'warning', icon: 'warning'},
+  {key: 'check_circle', icon: 'check_circle'},
+];

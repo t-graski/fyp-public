@@ -1,0 +1,55 @@
+<div class="navbar-wrapper" (click)="$showUserDropdown.set(false)">
+  <div class="navbar-left">
+    <div class="navbar-icon" (click)="navigateToDashboard()" title="Go to Dashboard">
+      <mat-icon aria-hidden="false" fontIcon="school"></mat-icon>
+    </div>
+    <div class="navbar-title">
+      <h2>{{ $title() }}</h2>
+      <p>{{ $subTitle() }}</p>
+    </div>
+  </div>
+
+  <div class="navbar-right">
+    <div class="navbar-tabs">
+      @for (link of $links(); track link.label) {
+        <button class="navbar-tab" (click)="navigateTo(link.path)" [title]="link.label">
+          @if (link.icon) {
+            <mat-icon aria-hidden="false" fontIcon="{{link.icon}}"></mat-icon>
+          }
+          <span>{{ link.label }}</span>
+        </button>
+      }
+    </div>
+
+    @if ($userName() || $userEmail()) {
+      <div class="navbar-profile-wrapper">
+        <button class="navbar-profile" (click)="toggleUserDropdown($event)">
+          <mat-icon class="profile-avatar" aria-hidden="false" fontIcon="account_circle"></mat-icon>
+          <div class="profile-info">
+            @if ($userName()) {
+              <p class="profile-name">{{ $userName() }}</p>
+            }
+            @if ($userEmail()) {
+              <p class="profile-email">{{ $userEmail() }}</p>
+            }
+          </div>
+          <mat-icon class="dropdown-icon" [fontIcon]="$showUserDropdown() ? 'expand_less' : 'expand_more'"></mat-icon>
+        </button>
+
+        @if ($showUserDropdown()) {
+          <div class="user-dropdown" (click)="$event.stopPropagation()">
+            <button class="dropdown-item" (click)="navigateToProfile()">
+              <mat-icon fontIcon="person"></mat-icon>
+              <span>Profile</span>
+            </button>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item dropdown-item--logout" (click)="logout()">
+              <mat-icon fontIcon="logout"></mat-icon>
+              <span>Logout</span>
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,22 @@
+﻿@startuml
+title Sequence: Admin Views Audit Log
+
+actor "Admin" as A
+participant "Frontend" as FE
+participant "Backend (API)" as BE
+database "PostgreSQL" as DB
+
+note over A,FE
+Precondition: Admin is logged in (JWT available).
+end note
+
+A -> FE: Filter audit (entityType/date/action)
+FE -> BE: GET /api/admin/audit?limit=&page=\nAuthorization: Bearer <JWT>
+
+BE -> BE: Validate JWT + authorize (SuperAdmin permission)
+BE -> DB: SELECT AuditEvents\n(limit/offset)
+DB --> BE: AuditEvent rows
+BE --> FE: 200 OK\nList<AuditEventDto>
+
+FE --> A: Render audit table
+@enduml

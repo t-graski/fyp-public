@@ -1,0 +1,290 @@
+﻿<div class="view-container">
+  <div class="view-header">
+    <h2>Audit Log</h2>
+    <button class="action-btn-toolbar action-btn-toolbar--secondary"
+            (click)="clearAuditFilters()" title="Clear all filters">
+      <mat-icon fontIcon="filter_alt_off"></mat-icon>
+      <span>Clear Filters</span>
+    </button>
+  </div>
+
+  <div class="audit-filters">
+    <div class="filter-row">
+      <div class="filter-group">
+        <label for="filter-user">User ID</label>
+        <input
+          type="text"
+          id="filter-user"
+          class="filter-input"
+          placeholder="Filter by user..."
+          [value]="$auditFilters().actorUserId || ''"
+          (input)="updateAuditFilter('actorUserId', $any($event.target).value)"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-entity-type">Entity Type</label>
+        <select
+          id="filter-entity-type"
+          class="filter-select"
+          [value]="$auditFilters().entityType || ''"
+          (change)="updateAuditFilter('entityType', $any($event.target).value)"
+        >
+          <option value="">All Types</option>
+          <option value="User">User</option>
+          <option value="Course">Course</option>
+          <option value="Module">Module</option>
+          <option value="Enrollment">Enrollment</option>
+          <option value="Student">Student</option>
+          <option value="ChatThread">ChatThread</option>
+          <option value="ChatMessage">ChatMessage</option>
+          <option value="AssessmentGrade">AssessmentGrade</option>
+          <option value="AttendanceSetting">AttendanceSetting</option>
+          <option value="ModuleContentChunk">ModuleContentChunk</option>
+          <option value="ModuleElement">ModuleElement</option>
+          <option value="ModulesFile">ModuleFile</option>
+          <option value="ModuleStaff">ModuleStaff</option>
+          <option value="Role">Role</option>
+          <option value="Staff">Staff</option>
+          <option value="StudentAttendance">StudentAttendance</option>
+          <option value="StudentRecord">StudentRecord</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-entity-id">Entity ID</label>
+        <input
+          type="text"
+          id="filter-entity-id"
+          class="filter-input"
+          placeholder="Filter by entity ID..."
+          [value]="$auditFilters().entityId || ''"
+          (input)="updateAuditFilter('entityId', $any($event.target).value)"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-action">Action</label>
+        <input
+          type="text"
+          id="filter-action"
+          class="filter-input"
+          placeholder="Filter by action..."
+          [value]="$auditFilters().action || ''"
+          (input)="updateAuditFilter('action', $any($event.target).value)"
+        />
+      </div>
+    </div>
+
+    <div class="filter-group filter-group--actions">
+      <button class="btn-primary" (click)="applyAuditFilters()">
+        <mat-icon fontIcon="search"></mat-icon>
+        Apply Filters
+      </button>
+    </div>
+  </div>
+
+  @if ($isLoading()) {
+    <div class="section-loading">
+      <mat-icon fontIcon="refresh" class="spinning"></mat-icon>
+      <p>Loading audit events...</p>
+    </div>
+  } @else {
+    <div class="pagination-controls pagination-controls--top">
+      <div class="pagination-nav">
+        <button class="pagination-btn" (click)="goToPreviousPage()" [disabled]="$currentPage() === 0">
+          <mat-icon fontIcon="chevron_left"></mat-icon>
+          Previous
+        </button>
+        <span class="pagination-info">Page {{ $currentPage() + 1 }}</span>
+        <button class="pagination-btn" (click)="goToNextPage()" [disabled]="!$hasNextPage()">
+          Next
+          <mat-icon fontIcon="chevron_right"></mat-icon>
+        </button>
+      </div>
+      <div class="pagination-meta">
+        <span class="pagination-count">
+          Showing {{ $displayedCount() }} item{{ $displayedCount() === 1 ? '' : 's' }}
+        </span>
+        <div class="page-size-selector">
+          <label for="page-size-top">Per page:</label>
+          <select id="page-size-top" class="filter-select page-size-select"
+                  (change)="changePageSize(+$any($event.target).value)">
+            @for (size of pageSizeOptions; track size) {
+              <option [value]="size" [selected]="size === $pageSize()">{{ size }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="audit-events-container">
+      @for (event of $auditEvents(); track event.id) {
+        <div class="audit-event" (click)="viewAuditEventDetails(event.id!)">
+          <div class="audit-event-icon" [class]="getActionColor(event.action)">
+            <mat-icon [fontIcon]="getActionIcon(event.action)"></mat-icon>
+          </div>
+          <div class="audit-event-content">
+            <div class="audit-event-header">
+              <span class="audit-event-action">{{ event.action || 'Unknown Action' }}</span>
+              <span class="audit-event-time">{{ formatAuditDate(event.occurredAtUtc) }}</span>
+            </div>
+            <div class="audit-event-summary">{{ event.summary || 'No summary available' }}</div>
+            <div class="audit-event-meta">
+              @if (event.entityType) {
+                <span class="audit-meta-tag">
+                  <mat-icon fontIcon="label"></mat-icon>
+                  {{ event.entityType }}
+                </span>
+              }
+              @if (event.actorUserId) {
+                <span class="audit-meta-tag">
+                  <mat-icon fontIcon="person"></mat-icon>
+                  {{ event.actorUserId }}
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <mat-icon fontIcon="history"></mat-icon>
+          <p>No audit events found</p>
+          <small>Try adjusting your filters</small>
+        </div>
+      }
+    </div>
+
+    <div class="pagination-controls pagination-controls--bottom">
+      <div class="pagination-nav">
+        <button class="pagination-btn" (click)="goToPreviousPage()" [disabled]="$currentPage() === 0">
+          <mat-icon fontIcon="chevron_left"></mat-icon>
+          Previous
+        </button>
+        <span class="pagination-info">Page {{ $currentPage() + 1 }}</span>
+        <button class="pagination-btn" (click)="goToNextPage()" [disabled]="!$hasNextPage()">
+          Next
+          <mat-icon fontIcon="chevron_right"></mat-icon>
+        </button>
+      </div>
+      <div class="pagination-meta">
+        <span class="pagination-count">
+          Showing {{ $displayedCount() }} item{{ $displayedCount() === 1 ? '' : 's' }}
+        </span>
+        <button class="pagination-btn pagination-btn--back-to-top" (click)="scrollToTop()" title="Back to top">
+          <mat-icon fontIcon="arrow_upward"></mat-icon>
+          Back to top
+        </button>
+      </div>
+    </div>
+  }
+</div>
+
+@if ($showAuditEventDetails()) {
+  <div class="modal-overlay" (click)="closeAuditEventDetails()">
+    <div class="modal-content modal-content--large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Audit Event Details</h3>
+        <button class="modal-close" (click)="closeAuditEventDetails()">
+          <mat-icon fontIcon="close"></mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        @for (event of $auditEvents(); track event.id) {
+          @if (event.id === $showAuditEventDetails()) {
+            <div class="audit-details">
+              <div class="detail-section">
+                <h4>Event Information</h4>
+                <div class="detail-grid">
+                  <div class="detail-item">
+                    <label>Event ID</label>
+                    <span class="detail-value">{{ event.id }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <label>Occurred At</label>
+                    <span class="detail-value">{{ formatAuditDate(event.occurredAtUtc) }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <label>Action</label>
+                    <span class="detail-badge" [class]="getActionColor(event.action)">
+                      <mat-icon [fontIcon]="getActionIcon(event.action)"></mat-icon>
+                      {{ event.action }}
+                    </span>
+                  </div>
+                  <div class="detail-item">
+                    <label>Actor</label>
+                    <span class="detail-value">{{ event.actorUserId || 'System' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <label>Entity Type</label>
+                    <span class="detail-value">{{ event.entityType || 'N/A' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <label>Entity ID</label>
+                    <span class="detail-value">{{ event.entityId || 'N/A' }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="detail-section">
+                <h4>Summary</h4>
+                <p class="summary-text">{{ event.summary || 'No summary available' }}</p>
+              </div>
+
+              @if (hasChanges(event.changesJson)) {
+                <div class="detail-section">
+                  <h4>Changes</h4>
+                  <div class="changes-container">
+                    @for (field of getChangeFields(event.changesJson); track field) {
+                      @if (getChangeValue(event.changesJson, field); as change) {
+                        <div class="change-item">
+                          <div class="change-field">
+                            <mat-icon fontIcon="label"></mat-icon>
+                            <span>{{ field }}</span>
+                          </div>
+                          <div class="change-values">
+                            <div class="change-old">
+                              <label>Old Value</label>
+                              <div class="value-box value-box--old">
+                                {{ change.Old !== null && change.Old !== undefined ? change.Old : 'null' }}
+                              </div>
+                            </div>
+                            <div class="change-arrow">
+                              <mat-icon fontIcon="arrow_forward"></mat-icon>
+                            </div>
+                            <div class="change-new">
+                              <label>New Value</label>
+                              <div class="value-box value-box--new">
+                                {{ change.New !== null && change.New !== undefined ? change.New : 'null' }}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    }
+                  </div>
+                </div>
+              }
+
+              @if (event.changesJson && !hasChanges(event.changesJson)) {
+                <div class="detail-section">
+                  <h4>Changes (Raw)</h4>
+                  <pre class="detail-json">{{ event.changesJson }}</pre>
+                </div>
+              }
+
+              @if (event.metadataJson) {
+                <div class="detail-section">
+                  <h4>Metadata</h4>
+                  <pre class="detail-json">{{ event.metadataJson }}</pre>
+                </div>
+              }
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+}
+

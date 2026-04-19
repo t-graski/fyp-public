@@ -1,0 +1,10 @@
+﻿@if ($showNavbar()) {
+  <app-navbar
+    [$title]="getTitle()"
+    [$subTitle]="getSubTitle()"
+    [$userName]="getUserName()"
+    [$userEmail]="getUserEmail()">
+  </app-navbar>
+}
+<router-outlet></router-outlet>
+<app-snackbar></app-snackbar>

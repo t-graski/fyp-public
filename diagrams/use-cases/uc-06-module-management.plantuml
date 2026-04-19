@@ -1,0 +1,32 @@
+﻿@startuml
+title UC-FR-06 Module Management
+left to right direction
+
+actor "Administrator" as Admin
+
+rectangle "Academic Management System" {
+  (View Modules) as View
+  (Create Module) as Create
+  (Edit Module) as Edit
+
+  (Validate Module Data) as Validate
+  (Reject Module Operation) as Reject
+}
+
+Admin -- View
+Admin -- Create
+Admin -- Edit
+
+Create ..> Validate : <<include>>
+Edit ..> Validate : <<include>>
+Reject ..> Create : <<extend>>
+Reject ..> Edit : <<extend>>
+
+note right of Reject
+Triggered when:
+- course does not exist
+- module code not unique
+- module not linked to valid course
+end note
+
+@enduml

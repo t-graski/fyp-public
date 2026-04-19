@@ -1,0 +1,85 @@
+<div class="wrapper">
+  <div class="login-card">
+    <div class="header">
+      <div class="icon">
+        <mat-icon aria-hidden="false" aria-label="School icon" fontIcon="school"></mat-icon>
+      </div>
+      <h1>Welcome Back</h1>
+      <p class="subtitle">Sign in to access your account</p>
+    </div>
+
+    <form class="form-wrapper" [formGroup]="loginForm" (ngSubmit)="signIn()">
+      <div class="input-group">
+        <label for="email">Email Address</label>
+        <div class="input-container">
+          <mat-icon class="input-icon" fontIcon="email"></mat-icon>
+          <input
+            id="email"
+            type="email"
+            placeholder="your.email@example.com"
+            formControlName="email"
+            autocomplete="email">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="password">Password</label>
+        <div class="input-container">
+          <mat-icon class="input-icon" fontIcon="lock"></mat-icon>
+          <input
+            id="password"
+            type="password"
+            placeholder="Enter your password"
+            formControlName="password"
+            autocomplete="current-password">
+        </div>
+      </div>
+
+      <div class="extras-wrapper">
+        <div class="remember">
+          <input type="checkbox" id="rememberMe" formControlName="rememberMe">
+          <label for="rememberMe">Remember me</label>
+        </div>
+      </div>
+
+      @if (errorMessage) {
+        <div class="error-message">
+          <mat-icon fontIcon="error_outline"></mat-icon>
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
+
+      <div class="help-link-wrapper">
+        <a class="help-link" (click)="toggleHelpText()">
+          <mat-icon fontIcon="help_outline"></mat-icon>
+          <span>I don't have an account?</span>
+        </a>
+      </div>
+
+      @if (showHelpText) {
+        <div class="help-text">
+          <mat-icon fontIcon="info_outline"></mat-icon>
+          <p>Please contact a university administrator to create an account for you.</p>
+        </div>
+      }
+
+      <button class="login-button" type="submit" [disabled]="loginForm.invalid || isSubmitting">
+        @if (!isSubmitting) {
+          <span>Sign In</span>
+        }
+
+        @if (isSubmitting) {
+          <span>
+          <span class="spinner"></span>
+          Signing In...
+        </span>
+        }
+
+      </button>
+    </form>
+
+    <div class="footer">
+      <p>Academic Management System</p>
+    </div>
+  </div>
+</div>

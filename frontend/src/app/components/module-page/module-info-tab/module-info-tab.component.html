@@ -1,0 +1,100 @@
+﻿<div class="info-tab">
+  <div class="info-grid">
+
+    <div class="info-section">
+      <h4 class="section-title">
+        <mat-icon fontIcon="school"></mat-icon>
+        Course
+      </h4>
+      <div class="info-rows">
+        <div class="info-row">
+          <span class="info-label">Course</span>
+          <span class="info-value">{{ $module().courseTitle }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Course Code</span>
+          <span class="info-value">{{ $module().courseCode }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <h4 class="section-title">
+        <mat-icon fontIcon="calendar_today"></mat-icon>
+        Schedule
+      </h4>
+      <div class="info-rows">
+        <div class="info-row">
+          <span class="info-label">Year of Study</span>
+          <span class="info-value">Year {{ $module().yearOfStudy }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Semester</span>
+          <span class="info-value">Semester {{ $module().semester }}</span>
+        </div>
+        @if ($module().scheduledDay != null) {
+          <div class="info-row">
+            <span class="info-label">Day</span>
+            <span class="info-value">{{ formatDay($module().scheduledDay) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Time</span>
+            <span class="info-value">{{ formatTime($module().scheduledStartLocal) }} – {{ formatTime($module().scheduledEndLocal) }}</span>
+          </div>
+        }
+        @if ($module().runsFrom) {
+          <div class="info-row">
+            <span class="info-label">Runs</span>
+            <span class="info-value">{{ $module().runsFrom }} → {{ $module().runsTo }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="info-section">
+      <h4 class="section-title">
+        <mat-icon fontIcon="info"></mat-icon>
+        Details
+      </h4>
+      <div class="info-rows">
+        @if ($module().credits != null) {
+          <div class="info-row">
+            <span class="info-label">Credits</span>
+            <span class="info-value">{{ $module().credits }}</span>
+          </div>
+        }
+        @if ($module().level != null) {
+          <div class="info-row">
+            <span class="info-label">Level</span>
+            <span class="info-value">{{ $module().level }}</span>
+          </div>
+        }
+        <div class="info-row">
+          <span class="info-label">Type</span>
+          <span class="info-value">
+            @if ($module().isCore) {
+              <span class="tag tag--core">Core</span>
+            } @else {
+              <span class="tag tag--optional">Optional</span>
+            }
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Academic Year</span>
+          <span class="info-value">{{ $module().academicYear }}</span>
+        </div>
+      </div>
+    </div>
+
+    @if ($module().description) {
+      <div class="info-section info-section--full">
+        <h4 class="section-title">
+          <mat-icon fontIcon="notes"></mat-icon>
+          Description
+        </h4>
+        <p class="description-text">{{ $module().description }}</p>
+      </div>
+    }
+
+  </div>
+</div>

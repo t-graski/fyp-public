@@ -1,0 +1,24 @@
+﻿@startuml
+title UC-FR-11 Attendance Management
+left to right direction
+
+actor "Student" as Student
+actor "Staff" as Staff
+actor "System" as System
+
+rectangle "Academic Management System" {
+  (Record Attendance Automatically) as Record
+  (View Attendance Records) as ViewStudent
+  (View Attendance Summaries) as ViewStaff
+}
+
+System -- Record
+Student -- ViewStudent
+Staff -- ViewStaff
+
+note right of Record
+Attendance is derived from login times
+for enrolled modules
+end note
+
+@enduml

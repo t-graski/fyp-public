@@ -1,0 +1,110 @@
+﻿<div class="reconciliation">
+
+  <div class="progress-bar">
+    <div class="progress-fill" [style.width.%]="progress()"></div>
+  </div>
+
+  <div class="field-counter">
+    Field {{ currentIndex() + 1 }} of {{ totalCount() }}
+  </div>
+
+  <div class="field-info">
+    <h3 class="field-name">
+      {{ field().label }}
+      @if (field().required) {
+        <span class="required-badge">Required</span>
+      }
+    </h3>
+    <p class="field-key">key: <code>{{ field().key }}</code></p>
+    <p class="field-description">
+      This field was not automatically matched to a column in your CSV file.
+      Please select the column that corresponds to <strong>{{ field().label }}</strong>, or provide a default value.
+    </p>
+  </div>
+
+  <div>
+    <p class="column-section-title">
+      <mat-icon fontIcon="table_chart"></mat-icon>
+      Select a CSV column
+    </p>
+    <div class="column-grid">
+      @for (header of csvHeaders(); track header) {
+        <button
+          class="column-btn"
+          [class.selected]="$selectedColumn() === header"
+          (click)="selectColumn(header)">
+          @if ($selectedColumn() === header) {
+            <mat-icon fontIcon="check_circle"></mat-icon>
+          } @else {
+            <mat-icon fontIcon="table_rows"></mat-icon>
+          }
+          <span>{{ header }}</span>
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="or-divider"><span>or</span></div>
+
+  <div class="default-section">
+    <button
+      class="default-toggle"
+      [class.active]="$useDefault()"
+      (click)="toggleDefault()">
+      <mat-icon [fontIcon]="$useDefault() ? 'check_box' : 'check_box_outline_blank'"></mat-icon>
+      Set a default value for all rows
+    </button>
+
+    @if ($useDefault()) {
+      <div class="default-input">
+        @if (field().options) {
+          <select
+            class="default-text-input"
+            [ngModel]="$defaultValue()"
+            (ngModelChange)="$defaultValue.set($event)">
+            <option value="">— Select a value —</option>
+            @for (opt of field().options!; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        } @else {
+          <input
+            type="text"
+            class="default-text-input"
+            [placeholder]="'Default value for ' + field().label"
+            [ngModel]="$defaultValue()"
+            (ngModelChange)="$defaultValue.set($event)" />
+        }
+      </div>
+    }
+  </div>
+
+  @if (!canProceed) {
+    <div class="required-warning">
+      <mat-icon fontIcon="warning_amber"></mat-icon>
+      <span>This field is required. Please select a column or set a default value to continue.</span>
+    </div>
+  }
+
+  <div class="step-actions">
+    @if (currentIndex() > 0) {
+      <button class="step-btn secondary" (click)="handleBack()">
+        <mat-icon fontIcon="arrow_back"></mat-icon>
+        Back
+      </button>
+    }
+    <button
+      class="step-btn primary"
+      [disabled]="!canProceed"
+      (click)="handleNext()">
+      @if (currentIndex() + 1 < totalCount()) {
+        <span>Next field</span>
+        <mat-icon fontIcon="arrow_forward"></mat-icon>
+      } @else {
+        <span>Review & confirm</span>
+        <mat-icon fontIcon="preview"></mat-icon>
+      }
+    </button>
+  </div>
+
+</div>

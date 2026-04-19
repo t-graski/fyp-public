@@ -1,0 +1,193 @@
+﻿<div class="overlay-backdrop">
+  <div class="overlay">
+
+    <div class="overlay-header">
+      <div class="overlay-title">
+        <mat-icon fontIcon="upload_file"></mat-icon>
+        <h2>{{ $title() }}</h2>
+      </div>
+      <button class="overlay-close" (click)="cancel()">
+        <mat-icon fontIcon="close"></mat-icon>
+      </button>
+    </div>
+
+    <div class="overlay-steps">
+      <div class="overlay-step" [class.active]="$step() === 'upload'" [class.done]="$step() !== 'upload'">
+        <span class="step-dot">
+          @if ($step() !== 'upload') {
+            <mat-icon fontIcon="check"></mat-icon>
+          } @else {
+            1
+          }
+        </span>
+        <span>Upload</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="overlay-step" [class.active]="$step() === 'reconciliation'" [class.done]="$step() === 'preview'">
+        <span class="step-dot">
+          @if ($step() === 'preview') {
+            <mat-icon fontIcon="check"></mat-icon>
+          } @else {
+            2
+          }
+        </span>
+        <span>Field Mapping</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="overlay-step" [class.active]="$step() === 'preview'">
+        <span class="step-dot">3</span>
+        <span>Preview & Confirm</span>
+      </div>
+    </div>
+
+    <div class="overlay-body">
+
+      @if ($step() === 'upload') {
+        <div class="upload-zone">
+          <div
+            class="dropzone"
+            [class.dragover]="$isDragOver()"
+            [class.loaded]="!!$fileName()"
+            (dragover)="handleDragOver($event)"
+            (dragleave)="handleDragLeave()"
+            (drop)="handleDrop($event)">
+            <mat-icon fontIcon="cloud_upload" class="dropzone-icon"></mat-icon>
+            @if ($fileName()) {
+              <p class="dropzone-filename">{{ $fileName() }}</p>
+              <p class="dropzone-hint">Drop a different file or click to change</p>
+            } @else {
+              <p class="dropzone-label">Drag & drop your CSV file here</p>
+              <p class="dropzone-hint">or click to browse</p>
+            }
+            <input type="file" accept=".csv" class="dropzone-input" (change)="handleFileInput($event)"/>
+          </div>
+
+          @if ($parseError()) {
+            <div class="upload-error">
+              <mat-icon fontIcon="error_outline"></mat-icon>
+              <span>{{ $parseError() }}</span>
+            </div>
+          }
+
+          <div class="expected-fields">
+            <p class="expected-fields-title">Expected fields</p>
+            <div class="field-tags">
+              @for (field of fields; track field.key) {
+                <span class="field-tag" [class.required]="field.required">
+                  {{ field.label }}
+                  @if (field.required) {
+                    <span class="field-required-star">*</span>
+                  }
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      @if ($step() === 'reconciliation') {
+        <app-csv-reconciliation-step
+          [field]="$currentReconciliationField()!"
+          [csvHeaders]="$reconciliationState()!.csvHeaders"
+          [currentMapping]="$currentReconciliationMapping()"
+          [currentIndex]="$reconciliationState()!.currentFieldIndex"
+          [totalCount]="$missingFields().length"
+          [progress]="$reconciliationProgress()"
+          (next)="handleReconciliationNext($event)"
+          (back)="handleReconciliationBack()">
+        </app-csv-reconciliation-step>
+      }
+
+      @if ($step() === 'preview') {
+        <div class="preview-panel">
+
+          <div class="preview-stats">
+            <span><strong>{{ $previewResult()?.totalRows ?? 0 }}</strong> total rows</span>
+            <span class="stats-dot">·</span>
+            <span><strong>{{ ($previewResult()?.totalRows ?? 0) - ($previewResult()?.skippedRows ?? 0) }}</strong> to import</span>
+            <span class="stats-dot">·</span>
+            <span><strong>{{ $previewResult()?.skippedRows ?? 0 }}</strong> skipped</span>
+          </div>
+
+          @if ($optionFields().length > 0) {
+            <div class="preview-notice">
+              <mat-icon fontIcon="info"></mat-icon>
+              <span>Fields marked with <mat-icon fontIcon="edit" class="inline-icon"></mat-icon> can be individually overridden per row using the dropdowns below.</span>
+            </div>
+          }
+
+          <div class="preview-table-wrapper">
+            <table class="preview-table">
+              <thead>
+                <tr>
+                  <th class="row-num-col">#</th>
+                  @for (col of $previewColumns(); track col) {
+                    <th>
+                      {{ col }}
+                      @if (fields | findFieldOptions: col) {
+                        <mat-icon fontIcon="edit" class="inline-icon"></mat-icon>
+                      }
+                    </th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of $pagedPreview(); track $index) {
+                  <tr>
+                    <td class="row-num-col">{{ $previewPage() * pageSize + $index + 1 }}</td>
+                    @for (col of $previewColumns(); track col) {
+                      @if (fields | findFieldOptions: col; as fieldOpts) {
+                        <td class="cell-editable">
+                          <select class="row-select" (change)="setRowOverride($previewPage() * pageSize + $index, col, $any($event.target).value)">
+                            <option value="" [selected]="!($rowOverrides()[$previewPage() * pageSize + $index]?.[col] ?? row[col])">— None —</option>
+                            @for (opt of fieldOpts; track opt.value) {
+                              <option [value]="opt.value" [selected]="($rowOverrides()[$previewPage() * pageSize + $index]?.[col] ?? row[col]) === opt.value">{{ opt.label }}</option>
+                            }
+                          </select>
+                        </td>
+                      } @else {
+                        <td>{{ row[col] ?? '' }}</td>
+                      }
+                    }
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          @if ($totalPages() > 1) {
+            <div class="preview-pagination">
+              <button class="pagination-btn" [disabled]="$previewPage() === 0" (click)="$previewPage.set($previewPage() - 1)">
+                <mat-icon fontIcon="chevron_left"></mat-icon>
+              </button>
+              <span class="pagination-label">Page {{ $previewPage() + 1 }} of {{ $totalPages() }}</span>
+              <button class="pagination-btn" [disabled]="$previewPage() + 1 >= $totalPages()" (click)="$previewPage.set($previewPage() + 1)">
+                <mat-icon fontIcon="chevron_right"></mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+    </div>
+
+    <div class="overlay-footer">
+      <button class="overlay-btn ghost" (click)="cancel()">Cancel</button>
+      <div class="footer-actions">
+        @if ($step() !== 'upload') {
+          <button class="overlay-btn secondary" (click)="goBack()">
+            <mat-icon fontIcon="arrow_back"></mat-icon>
+            Back
+          </button>
+        }
+        @if ($step() === 'preview') {
+          <button class="overlay-btn primary" (click)="confirmImport()">
+            <mat-icon fontIcon="check"></mat-icon>
+            Import {{ ($previewResult()?.totalRows ?? 0) - ($previewResult()?.skippedRows ?? 0) }} rows
+          </button>
+        }
+      </div>
+    </div>
+
+  </div>
+</div>

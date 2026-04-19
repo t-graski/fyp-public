@@ -1,0 +1,225 @@
+﻿@use 'styles' as *;
+
+.module-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: calc(100vh - 92px);
+  background-color: $neutral-200;
+}
+
+.module-header {
+  background-color: $neutral-100;
+  border-bottom: 1px solid $neutral-300;
+}
+
+.module-header-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $neutral-500;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 0;
+  flex-shrink: 0;
+  transition: color 200ms ease;
+
+  mat-icon {
+    font-size: 17px;
+    width: 17px;
+    height: 17px;
+  }
+
+  &:hover {
+    color: $brand-400;
+  }
+}
+
+.header-divider {
+  width: 1px;
+  height: 28px;
+  background-color: $neutral-300;
+  flex-shrink: 0;
+}
+
+.module-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+
+  h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: $neutral-700;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.module-code-chip {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background-color: $brand-100;
+  color: $brand-500;
+  flex-shrink: 0;
+}
+
+.module-layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.module-body {
+  flex: 1;
+  min-width: 0;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+app-module-ai-chat {
+  width: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  transition: width 300ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  .module-layout--chat-open & {
+    width: 420px;
+  }
+}
+
+.module-body-inner {
+  max-width: 90%;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background-color: $neutral-100;
+  border: 1px solid $neutral-300;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.tab-nav {
+  display: flex;
+  border-bottom: 1px solid $neutral-300;
+  background-color: $neutral-100;
+  padding: 0 8px;
+}
+
+.tab-nav-spacer {
+  flex: 1;
+}
+
+.tab-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: $neutral-500;
+  transition: all 200ms ease;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    color: $neutral-700;
+  }
+
+  &--active {
+    color: $brand-400;
+    border-bottom-color: $brand-400;
+
+    mat-icon {
+      color: $brand-400;
+    }
+  }
+}
+
+.edit-mode-button {
+  color: $neutral-500;
+  border-radius: 6px;
+  margin: 6px 4px;
+  padding: 6px 14px;
+  border-bottom: none !important;
+
+  &:hover {
+    background-color: $neutral-200;
+    color: $neutral-700;
+  }
+
+  &--active {
+    background-color: $brand-100;
+    color: $brand-500;
+    border-bottom: none !important;
+
+    mat-icon {
+      color: $brand-500;
+    }
+  }
+}
+
+.tab-count {
+  font-size: 11px;
+  font-weight: 600;
+  background-color: $brand-100;
+  color: $brand-500;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+
+.tab-content {
+  padding: 24px;
+}
+
+.loading-state,
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 16px;
+  color: $neutral-500;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: $neutral-400;
+  }
+
+  p {
+    font-size: 16px;
+    margin: 0;
+  }
+}

@@ -1,0 +1,327 @@
+﻿<div class="view-container">
+  <div class="view-header">
+    <h2>Modules Management</h2>
+    <div class="view-actions">
+      <div class="form-group-inline">
+        <label for="course-filter">Course:</label>
+        <select id="course-filter" [(ngModel)]="$selectedCourseId" (change)="loadModules()"
+                class="form-control-inline">
+          <option value="">-- Select Course --</option>
+          @for (course of $courses(); track course.id) {
+            <option [value]="course.id">{{ course.courseCode }} - {{ course.title }}</option>
+          }
+        </select>
+      </div>
+      <button *appHasPermission="'CatalogWrite'"
+              class="action-btn-toolbar action-btn-toolbar--primary"
+              (click)="openCreateModuleModal()" title="Add new module"
+              [disabled]="!$selectedCourseId()">
+        <mat-icon fontIcon="add"></mat-icon>
+        <span>Add Module</span>
+      </button>
+    </div>
+  </div>
+
+  <app-dynamic-table
+    [$data]="$modules()"
+    [$columns]="moduleColumns"
+    [$actions]="moduleActions"
+    [$loading]="$isLoading()"
+    $searchPlaceholder="Search modules by code or title..."
+    $emptyMessage="No modules found"
+    ($reload)="reloadModules()"
+  ></app-dynamic-table>
+</div>
+
+@if ($showModuleDetails()) {
+  <div class="modal-overlay" (click)="closeModuleDetails()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Module Details</h3>
+        <button class="modal-close" (click)="closeModuleDetails()">
+          <mat-icon fontIcon="close"></mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        @for (module of $modules(); track module.id) {
+          @if (module.id === $showModuleDetails()) {
+            <div class="detail-row">
+              <span class="detail-label">Module ID:</span>
+              <span class="detail-value">{{ module.id }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Module Code:</span>
+              <span class="detail-value">{{ module.moduleCode }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Title:</span>
+              <span class="detail-value">{{ module.title }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Description:</span>
+              <span class="detail-value">{{ module.description || 'N/A' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Credits:</span>
+              <span class="detail-value">{{ module.credits || 'N/A' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Level:</span>
+              <span class="detail-value">{{ module.level || 'N/A' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Semester:</span>
+              <span class="detail-value">{{ module.semesterOfStudy || 'N/A' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Term:</span>
+              <span class="detail-value">{{ module.term || 'N/A' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Course ID:</span>
+              <span class="detail-value">{{ module.courseId }}</span>
+            </div>
+
+            <div class="detail-row">
+              <span class="detail-label">Runs From:</span>
+              <span class="detail-value">{{ module.runsFrom || 'N/A' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Runs To:</span>
+              <span class="detail-value">{{ module.runsTo || 'N/A' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Scheduled Day:</span>
+              <span class="detail-value">{{ formatScheduledDay(module.scheduledDay) }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Scheduled Start:</span>
+              <span class="detail-value">{{ module.scheduledStartLocal || 'N/A' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Scheduled End:</span>
+              <span class="detail-value">{{ module.scheduledEndLocal || 'N/A' }}</span>
+            </div>
+          }
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeModuleDetails()">Close</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if ($showCreateModuleModal()) {
+  <div class="modal-overlay" (click)="closeCreateModuleModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Create New Module</h3>
+        <button class="modal-close" (click)="closeCreateModuleModal()">
+          <mat-icon fontIcon="close"></mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="module-code">Module Code *</label>
+          <input
+            type="text"
+            id="module-code"
+            [(ngModel)]="$newModule().moduleCode"
+            placeholder="e.g., CS201">
+        </div>
+
+        <div class="form-group">
+          <label for="module-title">Title *</label>
+          <input
+            type="text"
+            id="module-title"
+            [(ngModel)]="$newModule().title"
+            placeholder="Enter module title">
+        </div>
+
+        <div class="form-group">
+          <label for="module-description">Description</label>
+          <textarea
+            id="module-description"
+            [(ngModel)]="$newModule().description"
+            placeholder="Enter module description"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="module-credits">Credits</label>
+          <input
+            type="number"
+            id="module-credits"
+            [(ngModel)]="$newModule().credits"
+            min="0"
+            placeholder="e.g., 15">
+        </div>
+
+        <div class="form-group">
+          <label for="module-level">Level</label>
+          <input
+            type="number"
+            id="module-level"
+            [(ngModel)]="$newModule().level"
+            min="0"
+            placeholder="e.g., 4">
+        </div>
+
+        <div class="form-group">
+          <label for="module-semester">Semester of Study</label>
+          <input
+            type="number"
+            id="module-semester"
+            [(ngModel)]="$newModule().semesterOfStudy"
+            min="1"
+            placeholder="e.g., 1">
+        </div>
+
+        <div class="form-group">
+          <label for="module-term">Term</label>
+          <input
+            type="text"
+            id="module-term"
+            [(ngModel)]="$newModule().term"
+            placeholder="e.g., Autumn">
+        </div>
+
+        <div class="form-group">
+          <label for="module-runs-from">Runs From</label>
+          <input type="date" id="module-runs-from" [(ngModel)]="$newModule().runsFrom" />
+        </div>
+
+        <div class="form-group">
+          <label for="module-runs-to">Runs To</label>
+          <input type="date" id="module-runs-to" [(ngModel)]="$newModule().runsTo" />
+        </div>
+
+        <div class="form-group">
+          <label for="module-scheduled-day">Scheduled Day</label>
+          <select id="module-scheduled-day" [(ngModel)]="$newModule().scheduledDay">
+            <option [ngValue]="0">Sunday</option>
+            <option [ngValue]="1">Monday</option>
+            <option [ngValue]="2">Tuesday</option>
+            <option [ngValue]="3">Wednesday</option>
+            <option [ngValue]="4">Thursday</option>
+            <option [ngValue]="5">Friday</option>
+            <option [ngValue]="6">Saturday</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="module-scheduled-start">Scheduled Start</label>
+          <input type="time" id="module-scheduled-start" [(ngModel)]="$newModule().scheduledStartLocal" />
+        </div>
+
+        <div class="form-group">
+          <label for="module-scheduled-end">Scheduled End</label>
+          <input type="time" id="module-scheduled-end" [(ngModel)]="$newModule().scheduledEndLocal" />
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeCreateModuleModal()">Cancel</button>
+        <button class="btn-primary" (click)="createModule()">
+          <mat-icon fontIcon="add"></mat-icon>
+          Create Module
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if ($showEditModuleModal()) {
+  <div class="modal-overlay" (click)="closeEditModuleModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Edit Module</h3>
+        <button class="modal-close" (click)="closeEditModuleModal()">
+          <mat-icon fontIcon="close"></mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="edit-module-code">Module Code *</label>
+          <input type="text" id="edit-module-code" [(ngModel)]="$editModuleData().moduleCode" />
+        </div>
+
+        <div class="form-group">
+          <label for="edit-module-title">Title *</label>
+          <input type="text" id="edit-module-title" [(ngModel)]="$editModuleData().title" />
+        </div>
+
+        <div class="form-group">
+          <label for="edit-module-description">Description</label>
+          <textarea id="edit-module-description" [(ngModel)]="$editModuleData().description"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-module-credits">Credits</label>
+          <input type="number" id="edit-module-credits" [(ngModel)]="$editModuleData().credits" min="0" />
+        </div>
+
+        <div class="form-group">
+          <label for="edit-module-level">Level</label>
+          <input type="number" id="edit-module-level" [(ngModel)]="$editModuleData().level" min="0" />
+        </div>
+
+        <div class="form-group">
+          <label for="edit-module-semester">Semester of Study</label>
+          <input type="number" id="edit-module-semester" [(ngModel)]="$editModuleData().semesterOfStudy" min="1" />
+        </div>
+
+        <div class="form-group">
+          <label for="edit-module-term">Term</label>
+          <input type="text" id="edit-module-term" [(ngModel)]="$editModuleData().term" />
+        </div>
+
+        <div class="form-group">
+          <label for="edit-module-runs-from">Runs From</label>
+          <input type="date" id="edit-module-runs-from" [(ngModel)]="$editModuleData().runsFrom" />
+        </div>
+
+        <div class="form-group">
+          <label for="edit-module-runs-to">Runs To</label>
+          <input type="date" id="edit-module-runs-to" [(ngModel)]="$editModuleData().runsTo" />
+        </div>
+
+        <div class="form-group">
+          <label for="edit-module-scheduled-day">Scheduled Day</label>
+          <select id="edit-module-scheduled-day" [(ngModel)]="$editModuleData().scheduledDay">
+            <option [ngValue]="0">Sunday</option>
+            <option [ngValue]="1">Monday</option>
+            <option [ngValue]="2">Tuesday</option>
+            <option [ngValue]="3">Wednesday</option>
+            <option [ngValue]="4">Thursday</option>
+            <option [ngValue]="5">Friday</option>
+            <option [ngValue]="6">Saturday</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-module-scheduled-start">Scheduled Start</label>
+          <input type="time" id="edit-module-scheduled-start" [(ngModel)]="$editModuleData().scheduledStartLocal" />
+        </div>
+
+        <div class="form-group">
+          <label for="edit-module-scheduled-end">Scheduled End</label>
+          <input type="time" id="edit-module-scheduled-end" [(ngModel)]="$editModuleData().scheduledEndLocal" />
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeEditModuleModal()">Cancel</button>
+        <button class="btn-primary" (click)="updateModule()">
+          <mat-icon fontIcon="save"></mat-icon>
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,80 @@
+﻿<div class="grades-tab">
+  @if ($assessments().length === 0) {
+    <div class="empty-state">
+      <mat-icon fontIcon="grade"></mat-icon>
+      <p>No assessments in this module yet.</p>
+    </div>
+  } @else {
+    <div class="assessments-list">
+      @for (state of $assessments(); track state.elementId) {
+        <div class="assessment-card">
+          <div class="assessment-header" (click)="toggleExpand(state)">
+            <div class="assessment-header-left">
+              <mat-icon class="expand-icon" [fontIcon]="state.expanded ? 'expand_less' : 'expand_more'"></mat-icon>
+              <span class="assessment-name">{{ state.name }}</span>
+              @if (state.weight != null) {
+                <span class="weight-badge">{{ state.weight }}%</span>
+              }
+            </div>
+            <div class="assessment-header-right" (click)="$event.stopPropagation()">
+              @if (state.marksPublished) {
+                <span class="status-published">
+                  <mat-icon fontIcon="check_circle"></mat-icon> Published
+                </span>
+              } @else {
+                @if ($isStaff()) {
+                  <button
+                    class="publish-button"
+                    [disabled]="state.publishing"
+                    (click)="publish(state)">
+                    <mat-icon fontIcon="visibility"></mat-icon>
+                    Publish marks
+                  </button>
+                } @else {
+                  <span class="status-pending">
+                    <mat-icon fontIcon="schedule"></mat-icon> Pending
+                  </span>
+                }
+              }
+            </div>
+          </div>
+
+          @if (state.expanded) {
+            <div class="assessment-body">
+              @if (state.loading) {
+                <div class="loading-row">
+                  <mat-icon fontIcon="hourglass_empty"></mat-icon>
+                  <span>Loading…</span>
+                </div>
+              } @else if ($isStaff()) {
+                <div class="staff-summary-row">
+                  <span class="graded-count">{{ gradedCount(state) }} / {{ state.rows.length }} students graded</span>
+                </div>
+              } @else {
+                @if (state.rows.length > 0 && state.rows[0].grade != null) {
+                  <div class="student-grade-display">
+                    <div class="student-grade-score">
+                      <span class="score-value">{{ state.rows[0].grade.grade }}</span>
+                      <span class="score-max">/100</span>
+                    </div>
+                    @if (state.rows[0].grade.feedback) {
+                      <div class="student-feedback">
+                        <mat-icon fontIcon="chat_bubble_outline"></mat-icon>
+                        <span>{{ state.rows[0].grade.feedback }}</span>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="loading-row">
+                    <mat-icon fontIcon="pending"></mat-icon>
+                    <span>Not yet graded.</span>
+                  </div>
+                }
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

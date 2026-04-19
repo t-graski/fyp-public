@@ -1,0 +1,9 @@
+﻿@use 'styles' as *;
+
+.view-header {
+  .view-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+}

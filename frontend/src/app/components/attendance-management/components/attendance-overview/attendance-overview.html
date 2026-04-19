@@ -1,0 +1,33 @@
+<app-card [clickable]="false" class="overview-card">
+  <div class="overview-content">
+    <h2 class="overview-title">Attendance Overview</h2>
+
+    <div class="overview-stats">
+      <div class="stat-card">
+        <div class="stat-label">Overall Attendance</div>
+        <div class="stat-value" [style.color]="(($overview().overallPercent ?? 0) * 100) | attendanceColor">
+          {{ (($overview().overallPercent ?? 0) * 100) | number: '1.1-1' }}%
+        </div>
+        <app-progress-bar
+          [value]="($overview().overallPercent ?? 0) * 100"
+          [showValue]="false"
+          [color]="(($overview().overallPercent ?? 0) * 100) | attendanceColor"
+        ></app-progress-bar>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Sessions Attended</div>
+        <div class="stat-value">
+          {{ $overview().attendedSessionsTotal ?? 0 }} / {{ $overview().expectedSessionsTotal ?? 0 }}
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Period</div>
+        <div class="stat-value period">
+          {{ $overview().from | date: 'MMM d, yyyy' }} - {{ $overview().to | date: 'MMM d, yyyy' }}
+        </div>
+      </div>
+    </div>
+  </div>
+</app-card>

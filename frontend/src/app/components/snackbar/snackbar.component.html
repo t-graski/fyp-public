@@ -1,0 +1,19 @@
+<div class="snackbar-container">
+  @for (message of messages$ | async; track message.id) {
+    <div class="snackbar" [ngClass]="getSnackbarClass(message.statusCode)" [class.removing]="message.removing">
+      <div class="snackbar-icon">
+        <mat-icon [fontIcon]="getIcon(message.statusCode)"></mat-icon>
+      </div>
+      <div class="snackbar-content">
+        @if (message.errorCode) {
+          <div class="snackbar-code">{{ message.errorCode }}</div>
+        }
+        <div class="snackbar-message">{{ message.message }}</div>
+      </div>
+      <button class="snackbar-close" (click)="close(message.id)">
+        <mat-icon fontIcon="close"></mat-icon>
+      </button>
+    </div>
+  }
+</div>
+

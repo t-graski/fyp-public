@@ -1,0 +1,119 @@
+@use 'styles' as *;
+
+.date-range-picker {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.date-inputs {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.date-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 14px;
+    font-weight: 500;
+    color: $neutral-700;
+  }
+
+  input[type="date"] {
+    padding: 10px 12px;
+    border: 1px solid $neutral-400;
+    border-radius: 6px;
+    background-color: $neutral-100;
+    color: $neutral-800;
+    font-size: 14px;
+    font-weight: 400;
+    min-width: 160px;
+
+    &:focus {
+      outline: none;
+      border-color: $brand-500;
+      box-shadow: 0 0 0 2px rgba($brand-500, 0.1);
+    }
+  }
+}
+
+.quick-ranges {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 2px;
+  align-items: flex-end;
+}
+
+.quick-group {
+  display: flex;
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid $neutral-300;
+  border-radius: 10px;
+  background: $neutral-100;
+  margin-top: 0;
+}
+
+.quick-range-btn {
+  padding: 10px 16px;
+  border: 1px solid $neutral-400;
+  border-radius: 6px;
+  background-color: $neutral-100;
+  color: $neutral-700;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  &:hover {
+    background-color: $neutral-200;
+    border-color: $brand-500;
+  }
+
+  &:active {
+    background-color: $brand-500;
+    color: $neutral-100;
+  }
+}
+
+.quick-range-btn--active {
+  background-color: $brand-500;
+  color: $neutral-100;
+  border-color: $brand-500;
+  box-shadow: 0 0 0 2px rgba($brand-500, 0.15);
+
+  &:hover {
+    background-color: $brand-500;
+    border-color: $brand-500;
+  }
+}
+
+.quick-range-btn--nav {
+  background: $neutral-100;
+  border-color: $neutral-300;
+  color: $neutral-700;
+
+  &:hover {
+    background: $neutral-200;
+    border-color: $neutral-400;
+  }
+
+  &:active {
+    background: $neutral-200;
+    color: $neutral-800;
+  }
+}
+
+.btn-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}

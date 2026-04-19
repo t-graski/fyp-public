@@ -1,0 +1,203 @@
+﻿<div class="grading-page">
+  <app-context-menu
+    [$actions]="$contextMenu().actions"
+    [$isOpen]="$contextMenu().isOpen"
+    [$position]="$contextMenu().position"
+    (close)="contextMenu.close()">
+  </app-context-menu>
+
+  @if ($showBulkPanel()) {
+    <div class="bulk-overlay" (click)="$showBulkPanel.set(false)">
+      <div class="bulk-panel" (click)="$event.stopPropagation()">
+        <div class="bulk-panel-header">
+          <mat-icon fontIcon="format_color_fill"></mat-icon>
+          <span>Fill missing — {{ $assessments()[$bulkAssessmentIdx()!]?.name }}</span>
+          <button class="bulk-close" (click)="$showBulkPanel.set(false)">
+            <mat-icon fontIcon="close"></mat-icon>
+          </button>
+        </div>
+        <p class="bulk-hint">Only students without a grade will be filled.</p>
+        <div class="bulk-input-row">
+          <input class="bulk-input" type="number" min="0" max="100" placeholder="Grade (0–100)"
+                 [ngModel]="$bulkValue()" (ngModelChange)="$bulkValue.set($event)" (keydown.enter)="applyBulkFill()">
+          <button class="button button--primary" (click)="applyBulkFill()">Apply</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="grading-header">
+    <div class="grading-header-inner">
+      <button class="back-button" (click)="goBack()">
+        <mat-icon fontIcon="arrow_back"></mat-icon>
+        <span>Back to module</span>
+      </button>
+      <div class="header-divider"></div>
+      @if ($module(); as module) {
+        <div class="header-title">
+          <span class="module-code">{{ module.moduleCode }}</span>
+          <h1>Grading</h1>
+        </div>
+      }
+      <div class="header-actions">
+        @if ($anyDirty()) {
+          <button class="button button--primary" (click)="saveAll()">
+            <mat-icon fontIcon="save"></mat-icon>
+            Save all changes
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="grading-body">
+    @if ($isLoading()) {
+      <div class="state-box">
+        <mat-icon fontIcon="hourglass_empty"></mat-icon>
+        <p>Loading module...</p>
+      </div>
+    } @else if ($error()) {
+      <div class="state-box state-box--error">
+        <mat-icon fontIcon="error_outline"></mat-icon>
+        <p>{{ $error() }}</p>
+      </div>
+    } @else if ($assessments().length === 0) {
+      <div class="state-box">
+        <mat-icon fontIcon="assignment"></mat-icon>
+        <p>No assessment elements yet.</p>
+      </div>
+    } @else if ($rows().length === 0) {
+      <div class="state-box">
+        <mat-icon fontIcon="people"></mat-icon>
+        <p>No students enrolled.</p>
+      </div>
+    } @else {
+      <div class="grading-layout">
+        <div class="grading-sidebar">
+          <p class="sidebar-label">Assessments</p>
+          @for (col of $assessments(); track col.element.id; let ci = $index) {
+            <button
+              class="sidebar-item"
+              [class.sidebar-item--active]="ci === $selectedColumnIdx()"
+              (click)="$selectedColumnIdx.set(ci)">
+              <div class="sidebar-item-main">
+                <span class="sidebar-item-name">{{ col.name }}</span>
+                @if (!$isLoadingGrades()) {
+                  <span class="sidebar-item-progress">{{ gradedCount(ci) }} / {{ $rows().length }} graded</span>
+                }
+              </div>
+            </button>
+          }
+        </div>
+        @if ($selectedColumn(); as col) {
+          <div class="grading-panel">
+            <div class="assessment-toolbar">
+              <div class="assessment-toolbar-left">
+                <h2 class="assessment-title">{{ col.name }}</h2>
+                <span class="assessment-progress">
+                  @if ($isLoadingGrades()) {
+                    Loading grades…
+                  } @else {
+                    {{ gradedCount($selectedColumnIdx()) }} of {{ $rows().length }} students graded
+                  }
+                </span>
+              </div>
+              <div class="assessment-toolbar-right">
+                @if (col.marksPublished) {
+                  <span class="marks-published-badge">
+                    <mat-icon fontIcon="check_circle"></mat-icon> Published
+                  </span>
+                } @else {
+                  <button
+                    class="publish-button"
+                    [disabled]="col.publishing"
+                    (click)="publish(col)">
+                    <mat-icon fontIcon="visibility"></mat-icon>
+                    Publish marks
+                  </button>
+                }
+                <button class="toolbar-menu-button"
+                        (click)="openColContextMenu($event, col, $selectedColumnIdx()); $event.preventDefault()"
+                        title="More options">
+                  <mat-icon fontIcon="more_vert"></mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="grade-grid">
+              <div class="gh-student-header">Student</div>
+              <div class="gh-grade-header">
+                <span>Grade</span>
+                <span class="gh-grade-max">/100</span>
+              </div>
+              <div class="gh-feedback-header">Feedback</div>
+              <div class="gh-actions-header"></div>
+
+              @for (row of $rows(); track row.student.userId; let ri = $index) {
+                @let ci = $selectedColumnIdx();
+                <div class="g-student"
+                     [class.g-row-alt]="ri % 2 === 1"
+                     [class.g-row-dirty]="row.cells[ci].dirty"
+                     (contextmenu)="openRowContextMenu($event, row, ri)">
+                  <div class="g-avatar">{{ (row.student.fullName || '?')[0].toUpperCase() }}</div>
+                  <div class="g-student-info">
+                    <span class="g-student-name">{{ row.student.fullName }}</span>
+                    <span class="g-student-email">{{ row.student.email }}</span>
+                  </div>
+                </div>
+
+                <div class="g-cell g-grade-cell"
+                     [class.g-row-alt]="ri % 2 === 1"
+                     [class.g-row-dirty]="row.cells[ci].dirty"
+                     [class.g-cell-dirty]="row.cells[ci].dirty"
+                     [class.g-cell-saving]="row.cells[ci].saving">
+                  <input
+                    class="g-grade-input"
+                    type="number"
+                    min="0"
+                    max="100"
+                    placeholder="0"
+                    [ngModel]="row.cells[ci].editValue"
+                    (ngModelChange)="row.cells[ci].editValue = $event?.toString() ?? ''; markDirty(row, ci)">
+                </div>
+
+                <div class="g-cell g-feedback-cell"
+                     [class.g-row-alt]="ri % 2 === 1"
+                     [class.g-row-dirty]="row.cells[ci].dirty"
+                     [class.g-cell-dirty]="row.cells[ci].dirty"
+                     [class.g-cell-saving]="row.cells[ci].saving">
+                  <input
+                    class="g-feedback-input"
+                    type="text"
+                    placeholder="Optional feedback…"
+                    [(ngModel)]="row.cells[ci].editFeedback"
+                    (ngModelChange)="markDirty(row, ci)">
+                </div>
+
+                <div class="g-cell g-action-cell"
+                     [class.g-row-alt]="ri % 2 === 1"
+                     [class.g-row-dirty]="row.cells[ci].dirty">
+                  @if (row.cells[ci].saving) {
+                    <mat-icon class="g-status-saving" fontIcon="sync"></mat-icon>
+                  } @else if (!row.cells[ci].dirty && row.cells[ci].grade != null) {
+                    <mat-icon class="g-status-saved" fontIcon="check_circle"></mat-icon>
+                  }
+                  @if (row.cells[ci].dirty) {
+                    <button class="g-save-button" (click)="saveCell(row, ci)" title="Save">
+                      <mat-icon fontIcon="save"></mat-icon>
+                      Save
+                    </button>
+                  }
+                  <button class="g-menu-button" (click)="openRowContextMenu($event, row, ri); $event.preventDefault()"
+                          title="Row options">
+                    <mat-icon fontIcon="more_vert"></mat-icon>
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

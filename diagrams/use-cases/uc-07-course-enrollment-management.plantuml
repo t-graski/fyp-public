@@ -1,0 +1,28 @@
+﻿@startuml
+title UC-FR-07 Course Enrollment Management
+left to right direction
+
+actor "Staff (Authorized)" as Staff
+
+rectangle "Academic Management System" {
+  (Enroll Student in Course) as Enroll
+  (Change Course Enrollment Status) as Status
+
+  (Validate Enrollment Rules) as Validate
+  (Reject Enrollment) as Reject
+}
+
+Staff -- Enroll
+Staff -- Status
+
+Enroll ..> Validate : <<include>>
+Status ..> Validate : <<include>>
+Reject ..> Enroll : <<extend>>
+
+note right of Reject
+Triggered when:
+- student or course not found
+- student already enrolled in a course
+end note
+
+@enduml

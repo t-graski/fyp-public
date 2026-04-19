@@ -1,0 +1,139 @@
+﻿<div class="module-page">
+  @if ($isLoading()) {
+    <div class="loading-state">
+      <p>Loading module...</p>
+    </div>
+  } @else if ($error()) {
+    <div class="error-state">
+      <mat-icon fontIcon="error_outline"></mat-icon>
+      <p>{{ $error() }}</p>
+      <button class="back-button" (click)="goBack()">Go Back</button>
+    </div>
+  } @else if ($module(); as module) {
+    <div class="module-header">
+      <div class="module-header-inner">
+        <button class="back-button" (click)="goBack()">
+          <mat-icon fontIcon="arrow_back"></mat-icon>
+          <span>Back</span>
+        </button>
+
+        <div class="header-divider"></div>
+
+        <div class="module-title-row">
+          <span class="module-code-chip">{{ module.moduleCode }}</span>
+          <h1>{{ module.title }}</h1>
+        </div>
+      </div>
+    </div>
+
+    <div class="module-layout" [class.module-layout--chat-open]="$isChatOpen()">
+      <div class="module-body">
+        <div class="module-body-inner">
+          <nav class="tab-nav">
+            <button
+              class="tab-button"
+              [class.tab-button--active]="$activeTab() === 'elements'"
+              (click)="setTab('elements')">
+              <mat-icon fontIcon="widgets"></mat-icon>
+              <span>Elements</span>
+            </button>
+            <button
+              class="tab-button"
+              [class.tab-button--active]="$activeTab() === 'grades'"
+              (click)="setTab('grades')">
+              <mat-icon fontIcon="grade"></mat-icon>
+              <span>Grades</span>
+            </button>
+
+            <div class="tab-nav-spacer"></div>
+
+            @if ($isCurrentUserStaff() && $activeTab() === 'elements') {
+              <button
+                class="tab-button edit-mode-button"
+                [class.edit-mode-button--active]="$editMode()"
+                (click)="toggleEditMode()">
+                <mat-icon [fontIcon]="$editMode() ? 'edit_off' : 'edit'"></mat-icon>
+                <span>{{ $editMode() ? 'Done' : 'Edit' }}</span>
+              </button>
+            }
+
+            @if ($isCurrentUserStaff() && $activeTab() === 'grades') {
+              <button class="tab-button edit-mode-button" (click)="navigateToGrading()">
+                <mat-icon fontIcon="grading"></mat-icon>
+                <span>Grade students</span>
+              </button>
+            }
+
+            @if ($isCurrentUserStaff()) {
+              <button
+                class="tab-button edit-mode-button index-button"
+                [disabled]="$isIndexing()"
+                [title]="'Generate search index for this module so the AI chat can answer from its content.'"
+                (click)="indexModuleContent()">
+                @if ($isIndexing()) {
+                  <mat-icon fontIcon="hourglass_top"></mat-icon>
+                  <span>Indexing...</span>
+                } @else {
+                  <mat-icon fontIcon="manage_search"></mat-icon>
+                  <span>Index content</span>
+                }
+              </button>
+            }
+
+            <button
+              class="tab-button"
+              [class.tab-button--active]="$activeTab() === 'members'"
+              (click)="setTab('members')">
+              <mat-icon fontIcon="people"></mat-icon>
+              <span>Members</span>
+              @if ((module.students?.length ?? 0) + (module.staff?.length ?? 0) > 0) {
+                <span class="tab-count">{{ (module.students?.length ?? 0) + (module.staff?.length ?? 0) }}</span>
+              }
+            </button>
+
+            <button
+              class="tab-button"
+              [class.tab-button--active]="$activeTab() === 'info'"
+              (click)="setTab('info')">
+              <mat-icon fontIcon="info"></mat-icon>
+              <span>Info</span>
+            </button>
+          </nav>
+
+          <div class="tab-content">
+            @if ($activeTab() === 'elements') {
+              <app-module-elements-tab
+                [$elements]="module.elements ?? []"
+                [$moduleId]="module.id!"
+                [$editMode]="$editMode()"
+                [$highlightedElementId]="$highlightedElementId()"
+                (elementsChanged)="onElementsChanged($event)">
+              </app-module-elements-tab>
+            } @else if ($activeTab() === 'members') {
+              <app-module-members-tab
+                [$students]="module.students ?? []"
+                [$staff]="module.staff ?? []">
+              </app-module-members-tab>
+            } @else if ($activeTab() === 'grades') {
+              <app-module-grades-tab
+                [$elements]="module.elements ?? []"
+                [$moduleId]="module.id!"
+                [$isStaff]="$isCurrentUserStaff()"
+                [$students]="module.students ?? []">
+              </app-module-grades-tab>
+            } @else if ($activeTab() === 'info') {
+              <app-module-info-tab [$module]="module"></app-module-info-tab>
+            }
+          </div>
+        </div>
+      </div>
+
+      <app-module-ai-chat
+        [$moduleId]="module.id!"
+        [$isOpen]="$isChatOpen()"
+        (isOpenChange)="$isChatOpen.set($event)"
+        (highlightElement)="onHighlightElement($event)">
+      </app-module-ai-chat>
+    </div>
+  }
+</div>

@@ -1,0 +1,173 @@
+<div class="view-container">
+  <div class="view-header">
+    <h2>Login History</h2>
+    <button class="action-btn-toolbar action-btn-toolbar--secondary"
+            (click)="clearLoginFilters()" title="Clear all filters">
+      <mat-icon fontIcon="filter_alt_off"></mat-icon>
+      <span>Clear Filters</span>
+    </button>
+  </div>
+
+  <div class="audit-filters">
+    <div class="filter-row">
+      <div class="filter-group">
+        <label for="filter-user">User ID</label>
+        <input
+          type="text"
+          id="filter-user"
+          class="filter-input"
+          placeholder="Filter by user ID..."
+          [value]="$loginFilters().actorUserId || ''"
+          (input)="updateLoginFilter('actorUserId', $any($event.target).value)"
+        />
+      </div>
+    </div>
+
+    <div class="filter-group filter-group--actions">
+      <button class="btn-primary" (click)="applyLoginFilters()">
+        <mat-icon fontIcon="search"></mat-icon>
+        Apply Filters
+      </button>
+    </div>
+  </div>
+
+  @if ($isLoading()) {
+    <div class="section-loading">
+      <mat-icon fontIcon="refresh" class="spinning"></mat-icon>
+      <p>Loading login events...</p>
+    </div>
+  } @else {
+    <div class="pagination-controls pagination-controls--top">
+      <div class="pagination-nav">
+        <button class="pagination-btn" (click)="goToPreviousPage()" [disabled]="$currentPage() === 0">
+          <mat-icon fontIcon="chevron_left"></mat-icon>
+          Previous
+        </button>
+        <span class="pagination-info">Page {{ $currentPage() + 1 }}</span>
+        <button class="pagination-btn" (click)="goToNextPage()" [disabled]="!$hasNextPage()">
+          Next
+          <mat-icon fontIcon="chevron_right"></mat-icon>
+        </button>
+      </div>
+      <div class="pagination-meta">
+        <span class="pagination-count">
+          Showing {{ $displayedCount() }} item{{ $displayedCount() === 1 ? '' : 's' }}
+        </span>
+        <div class="page-size-selector">
+          <label for="page-size-top">Per page:</label>
+          <select id="page-size-top" class="filter-select page-size-select"
+                  (change)="changePageSize(+$any($event.target).value)">
+            @for (size of pageSizeOptions; track size) {
+              <option [value]="size" [selected]="size === $pageSize()">{{ size }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="audit-events-container">
+      @for (event of $loginEvents(); track event.id) {
+        <div class="audit-event" (click)="viewLoginEventDetails(event.id!)">
+          <div class="audit-event-icon action-login">
+            <mat-icon fontIcon="login"></mat-icon>
+          </div>
+          <div class="audit-event-content">
+            <div class="audit-event-header">
+              <span class="audit-event-action">User Login</span>
+              <span class="audit-event-time">{{ formatLoginDate(event.occurredAtUtc) }}</span>
+            </div>
+            <div class="audit-event-summary">
+              {{ event.email || 'Unknown user' }} logged in
+            </div>
+            <div class="audit-event-meta">
+              @if (event.actorUserId) {
+                <span class="audit-meta-tag">
+                  <mat-icon fontIcon="person"></mat-icon>
+                  {{ event.actorUserId }}
+                </span>
+              }
+              @if (event.email) {
+                <span class="audit-meta-tag">
+                  <mat-icon fontIcon="email"></mat-icon>
+                  {{ event.email }}
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <mat-icon fontIcon="login"></mat-icon>
+          <p>No login events found</p>
+          <small>Try adjusting your filters</small>
+        </div>
+      }
+    </div>
+
+    <div class="pagination-controls pagination-controls--bottom">
+      <div class="pagination-nav">
+        <button class="pagination-btn" (click)="goToPreviousPage()" [disabled]="$currentPage() === 0">
+          <mat-icon fontIcon="chevron_left"></mat-icon>
+          Previous
+        </button>
+        <span class="pagination-info">Page {{ $currentPage() + 1 }}</span>
+        <button class="pagination-btn" (click)="goToNextPage()" [disabled]="!$hasNextPage()">
+          Next
+          <mat-icon fontIcon="chevron_right"></mat-icon>
+        </button>
+      </div>
+      <div class="pagination-meta">
+        <span class="pagination-count">
+          Showing {{ $displayedCount() }} item{{ $displayedCount() === 1 ? '' : 's' }}
+        </span>
+        <button class="pagination-btn pagination-btn--back-to-top" (click)="scrollToTop()" title="Back to top">
+          <mat-icon fontIcon="arrow_upward"></mat-icon>
+          Back to top
+        </button>
+      </div>
+    </div>
+  }
+</div>
+
+@if ($showLoginEventDetails()) {
+  <div class="modal-overlay" (click)="closeLoginEventDetails()">
+    <div class="modal-content modal-content--large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Login Event Details</h3>
+        <button class="modal-close" (click)="closeLoginEventDetails()">
+          <mat-icon fontIcon="close"></mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        @for (event of $loginEvents(); track event.id) {
+          @if (event.id === $showLoginEventDetails()) {
+            <div class="audit-details">
+              <div class="detail-section">
+                <h4>Event Information</h4>
+                <div class="detail-grid">
+                  <div class="detail-item">
+                    <label>Event ID</label>
+                    <span class="detail-value">{{ event.id }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <label>Occurred At</label>
+                    <span class="detail-value">{{ formatLoginDate(event.occurredAtUtc) }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <label>Email</label>
+                    <span class="detail-value">{{ event.email || 'N/A' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <label>User ID</label>
+                    <span class="detail-value">{{ event.actorUserId || 'N/A' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+}

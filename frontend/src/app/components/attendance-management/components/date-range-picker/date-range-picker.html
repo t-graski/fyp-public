@@ -1,0 +1,66 @@
+<div class="date-range-picker">
+  <div class="date-inputs">
+    <div class="date-input-wrapper">
+      <label for="from-date">From</label>
+      <input
+        id="from-date"
+        type="date"
+        [ngModel]="$dateRange().from"
+        (ngModelChange)="onFromChange($event)"
+      />
+    </div>
+
+    <div class="date-input-wrapper">
+      <label for="to-date">To</label>
+      <input
+        id="to-date"
+        type="date"
+        [ngModel]="$dateRange().to"
+        (ngModelChange)="onToChange($event)"
+      />
+    </div>
+  </div>
+
+  <div class="quick-ranges">
+    <button
+      type="button"
+      class="quick-range-btn quick-range-btn--nav"
+      (click)="previousWeek()">
+      <mat-icon class="btn-icon">chevron_left</mat-icon>
+      Previous
+    </button>
+
+    <button
+      type="button"
+      class="quick-range-btn"
+      [class.quick-range-btn--active]="isQuickRangeActive(7)"
+      (click)="setThisWeek()"
+    >This week
+    </button>
+
+    <button
+      type="button"
+      class="quick-range-btn quick-range-btn--nav"
+      (click)="nextWeek()"
+    >
+      Next
+      <mat-icon class="btn-icon">chevron_right</mat-icon>
+    </button>
+
+    <button
+      type="button"
+      class="quick-range-btn"
+      [class.quick-range-btn--active]="isQuickRangeActive(30)"
+      (click)="setQuickRange(30)"
+    >Last 30 days
+    </button>
+
+    <button
+      type="button"
+      class="quick-range-btn"
+      [class.quick-range-btn--active]="isQuickRangeActive(90)"
+      (click)="setQuickRange(90)"
+    >Last 90 days
+    </button>
+  </div>
+</div>

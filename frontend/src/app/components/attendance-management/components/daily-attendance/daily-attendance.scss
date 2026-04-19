@@ -1,0 +1,190 @@
+@use 'styles' as *;
+
+.daily-content {
+  padding: 24px;
+}
+
+.daily-attendance-container {
+  width: 100%;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: $neutral-800;
+  margin-bottom: 16px;
+}
+
+.days-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.day-card {
+  width: 100%;
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  margin-left: 4px;
+  border-bottom: 1px solid $neutral-300;
+}
+
+.day-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.calendar-icon {
+  color: $brand-500;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.day-date {
+  .date-main {
+    font-size: 16px;
+    font-weight: 600;
+    color: $neutral-800;
+  }
+
+  .date-year {
+    font-size: 14px;
+    font-weight: 400;
+    color: $neutral-600;
+  }
+}
+
+.modules-badge {
+  font-size: 14px;
+  font-weight: 500;
+  color: $brand-500;
+  background: rgba($brand-500, 0.1);
+  padding: 6px 12px;
+  border-radius: 16px;
+}
+
+.modules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.module-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 12px;
+  background: $neutral-100;
+  border-radius: 8px;
+  border: 1px solid $neutral-300;
+}
+
+.module-item--missed {
+  background: rgba($error-300, 0.06);
+  border-color: rgba($error-300, 0.25);
+}
+
+.check-icon {
+  color: $success-400;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.attended-icon {
+  color: $success-400;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+}
+
+.missed-icon {
+  color: $error-300;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+}
+
+.module-info {
+  flex: 1;
+
+  .module-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: $neutral-800;
+    margin-bottom: 2px;
+  }
+
+  .module-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 12px;
+    color: $neutral-600;
+
+    .scheduled-time {
+      font-weight: 500;
+      color: $neutral-700;
+    }
+
+    .checked-in-time {
+      color: $success-400;
+      font-weight: 500;
+    }
+
+    .missed-label {
+      color: $error-300;
+      font-weight: 600;
+    }
+  }
+}
+
+.no-attendance {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: $neutral-100;
+  border-radius: 6px;
+  color: $neutral-600;
+  font-size: 14px;
+
+  .warning-icon {
+    color: $neutral-500;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.empty-state-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+
+  .empty-icon {
+    color: $neutral-500;
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+  }
+
+  .empty-message {
+    font-size: 16px;
+    font-weight: 400;
+    color: $neutral-600;
+  }
+}

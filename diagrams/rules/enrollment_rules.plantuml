@@ -1,0 +1,44 @@
+﻿@startuml
+title Rule Flow: Enroll Student In Module (Validation + Policies)
+
+start
+
+:Check student exists\n(Students: Id & not deleted);
+if (Student exists?) then (Yes)
+else (No)
+  :Throw 404 STUDENT_NOT_FOUND;
+  stop
+endif
+
+:Load module\n(Modules: Id & not deleted);
+if (Module found?) then (Yes)
+else (No)
+  :Throw 404 MODULE_NOT_FOUND;
+  stop
+endif
+
+:Find student's active course enrolment\n(status=Active, not deleted);
+if (Active course found?) then (Yes)
+else (No)
+  :Throw 409 NO_ACTIVE_COURSE;
+  stop
+endif
+
+if (Module.CourseId == ActiveCourseId?) then (Yes)
+else (No)
+  :Throw 409 MODULE_NOT_IN_COURSE;
+  stop
+endif
+
+:Check duplicate module enrolment\n(same student, module, academicYear, semester, not deleted);
+if (Duplicate exists?) then (Yes)
+  :Throw 409 DUPLICATE_MODULE_ENROLMENT;
+  stop
+else (No)
+endif
+
+:Add StudentModuleEnrollment\nStatus=Enrolled\nEnrolledAtUtc=now;
+:SaveChanges();
+
+stop
+@enduml

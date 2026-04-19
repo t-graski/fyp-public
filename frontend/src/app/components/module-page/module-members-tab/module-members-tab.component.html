@@ -1,0 +1,57 @@
+﻿<div class="members-tab">
+  <div class="members-section">
+    <div class="members-section-header">
+      <mat-icon fontIcon="school"></mat-icon>
+      <h3>Teaching Staff</h3>
+      <span class="member-count">{{ $staff().length }}</span>
+    </div>
+    @if ($staff().length > 0) {
+      <div class="members-list">
+        @for (member of $staff(); track member.userId) {
+          <div class="member-item">
+            <div class="member-avatar">
+              <mat-icon fontIcon="person"></mat-icon>
+            </div>
+            <div class="member-info">
+              <span class="member-name">{{ member.fullName }}</span>
+              <span class="member-email">{{ member.email }}</span>
+            </div>
+            <span class="member-role member-role--staff">Staff</span>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="empty-state-inline">
+        <p>No staff assigned to this module.</p>
+      </div>
+    }
+  </div>
+
+  <div class="members-section">
+    <div class="members-section-header">
+      <mat-icon fontIcon="people"></mat-icon>
+      <h3>Students</h3>
+      <span class="member-count">{{ $students().length }}</span>
+    </div>
+    @if ($students().length > 0) {
+      <div class="members-list">
+        @for (member of $students(); track member.userId) {
+          <div class="member-item">
+            <div class="member-avatar">
+              <mat-icon fontIcon="person"></mat-icon>
+            </div>
+            <div class="member-info">
+              <span class="member-name">{{ member.fullName }}</span>
+              <span class="member-email">{{ member.email }}</span>
+            </div>
+            <span class="member-role member-role--student">Student</span>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="empty-state-inline">
+        <p>No students enrolled in this module.</p>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,34 @@
+@startuml
+title Final Year Project - System Architecture
+
+skinparam shadowing false
+skinparam componentStyle rectangle
+
+actor "User (Browser)" as user
+
+node "Host Machine\n(Docker Engine)" as host {
+
+    node "Container: Angular Frontend" as fe {
+      artifact "Angular App" as fe_app
+    }
+
+    node "Container: ASP.NET Core Backend" as be {
+      artifact "ASP.NET Core API" as be_api
+    }
+
+    database "Container: PostgreSQL" as db {
+      artifact "PostgreSQL DB" as db_data
+    }
+
+    node "Container: pgAdmin" as pga {
+      artifact "pgAdmin Web UI" as pga_ui
+    }
+}
+
+user --> fe_app : HTTPS (80/443)
+fe_app --> be_api : HTTP/HTTPS (5063)
+
+be_api --> db_data : TCP 5432\n(DB connection string)
+pga_ui --> db_data : TCP 5432\n(DB admin access)
+
+@enduml

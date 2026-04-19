@@ -1,0 +1,187 @@
+﻿@use 'styles' as *;
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.tab-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  background: $neutral-200;
+  border-radius: 10px;
+}
+
+.tab-button {
+  border: none;
+  background: transparent;
+  color: $neutral-700;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: $neutral-100;
+    color: $neutral-800;
+  }
+
+  &.active {
+    background: $neutral-100;
+    color: $brand-500;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.loading-spinner {
+  background: $neutral-100;
+  padding: 32px 48px;
+  border-radius: 12px;
+  text-align: center;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: $brand-400;
+    margin-bottom: 16px;
+
+    &.spinning {
+      animation: spin 1s linear infinite;
+    }
+  }
+
+  p {
+    color: $neutral-700;
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.student-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid $neutral-300;
+  transition: background-color 0.15s;
+  user-select: none;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background-color: $neutral-200;
+  }
+
+  &--selected {
+    background-color: $brand-100;
+
+    &:hover {
+      background-color: darken($brand-100, 5%);
+    }
+  }
+
+  input[type="checkbox"] {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    accent-color: $brand-400;
+  }
+}
+
+.student-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.student-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: $neutral-800;
+}
+
+.student-email {
+  font-size: 12px;
+  color: $neutral-600;
+}
+
+.module-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid $neutral-300;
+  transition: all 0.15s;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background-color: $neutral-200;
+  }
+
+  &--selected {
+    background-color: $brand-100;
+    border-left: 4px solid $brand-400;
+
+    &:hover {
+      background-color: darken($brand-100, 5%);
+    }
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.module-code {
+  font-size: 12px;
+  font-weight: 600;
+  color: $brand-400;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.module-title {
+  font-size: 14px;
+  color: $neutral-800;
+}
+
+.selection-summary {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background-color: $brand-100;
+  color: $brand-500;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+}

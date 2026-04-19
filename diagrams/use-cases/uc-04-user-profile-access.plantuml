@@ -1,0 +1,32 @@
+﻿@startuml
+title UC-FR-04 User Profile Access
+left to right direction
+
+actor "Authenticated User" as AU
+actor "Administrator/Staff" as Privileged
+
+rectangle "Academic Management System" {
+  (View Own Profile) as Own
+  (View Other User Profile) as Other
+  (Authorize Profile Access) as Authz
+  (Deny Profile Access) as Deny
+}
+
+AU -- Own
+Privileged -- Other
+
+Own ..> Authz : <<include>>
+Other ..> Authz : <<include>>
+Deny ..> Other : <<extend>>
+
+note right of Own
+Includes: name, email, roles,
+permissions, enrolled course/modules
+end note
+
+note right of Deny
+Triggered when user tries to view another
+profile without authorization
+end note
+
+@enduml

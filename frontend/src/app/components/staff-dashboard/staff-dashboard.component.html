@@ -1,0 +1,58 @@
+﻿<div class="dashboard">
+  @if ($dashboardData(); as data) {
+
+    <div class="dashboard-content">
+      <div class="action-buttons">
+        <button class="action-button" (click)="navigateToAttendance()">
+          <mat-icon fontIcon="how_to_reg"></mat-icon>
+          <span>Attendance Management</span>
+        </button>
+      </div>
+
+      <app-card>
+        <div class="modules-container">
+          <div class="modules-header">
+            <div class="modules-title">
+              <mat-icon fontIcon="menu_book"></mat-icon>
+              <h3>My Modules</h3>
+            </div>
+            <div class="search-wrapper">
+              <mat-icon fontIcon="search"></mat-icon>
+              <input
+                type="text"
+                placeholder="Search modules..."
+                [value]="$searchQuery()"
+                (input)="onSearchChange($any($event.target).value)"
+              />
+            </div>
+          </div>
+
+          <div class="modules-list">
+            @for (module of $filteredModules(); track module.moduleId) {
+              <div class="module-item" (click)="onModuleClick(module)">
+                <div class="module-info">
+                  <h4>{{ module.title }}</h4>
+                  <p class="module-code">{{ module.moduleCode }}</p>
+                </div>
+                <mat-icon fontIcon="chevron_right"></mat-icon>
+              </div>
+            } @empty {
+              <p class="no-modules">
+                {{ $searchQuery() ? 'No modules found matching your search' : 'No modules assigned' }}
+              </p>
+            }
+          </div>
+        </div>
+      </app-card>
+    </div>
+
+  } @else if ($isLoading()) {
+    <div class="loading">
+      <p>Loading dashboard...</p>
+    </div>
+  } @else {
+    <div class="error">
+      <p>Failed to load dashboard. Please try again.</p>
+    </div>
+  }
+</div>

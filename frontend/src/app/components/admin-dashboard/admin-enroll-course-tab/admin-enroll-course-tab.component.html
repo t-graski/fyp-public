@@ -1,0 +1,115 @@
+﻿<div class="view-container">
+  <div class="view-header">
+    <h2>Enroll Students in Course</h2>
+  </div>
+
+  @if ($isLoadingEnrollmentData()) {
+    <div class="loading-overlay">
+      <div class="loading-spinner">
+        <mat-icon fontIcon="hourglass_empty" class="spinning"></mat-icon>
+        <p>Loading student enrollment data...</p>
+      </div>
+    </div>
+  }
+
+  <div class="enrollment-container" [class.disabled]="$isLoadingEnrollmentData()">
+    <div class="enrollment-section">
+      <h3>Select Students</h3>
+      <div class="search-bar">
+        <mat-icon fontIcon="search"></mat-icon>
+        <input
+          type="text"
+          placeholder="Search students by name or email..."
+          [(ngModel)]="$studentSearchQuery"
+          class="search-input"
+          [disabled]="$isLoadingEnrollmentData() || $isLoading()"
+        />
+      </div>
+
+      @if ($isLoading()) {
+        <div class="section-loading">
+          <mat-icon fontIcon="refresh" class="spinning"></mat-icon>
+          <p>Loading students...</p>
+        </div>
+      } @else {
+        <div class="student-list">
+          @for (user of $filteredStudents(); track user.id) {
+            <label class="student-item"
+                   [class.student-item--selected]="isStudentSelected(user.id!)">
+              <input
+                type="checkbox"
+                [checked]="isStudentSelected(user.id!)"
+                (change)="toggleStudentSelection(user.id!)"
+                [disabled]="$isLoadingEnrollmentData()"
+              />
+              <div class="student-info">
+                <span class="student-name">{{ user.firstName }} {{ user.lastName }}</span>
+                <span class="student-email">{{ user.email }}</span>
+              </div>
+            </label>
+          } @empty {
+            <div class="empty-state">
+              <mat-icon fontIcon="person_off"></mat-icon>
+              <p>No students found</p>
+            </div>
+          }
+        </div>
+
+        <div class="selection-summary">
+          {{ getSelectedStudentIds().length }} student(s) selected
+        </div>
+      }
+    </div>
+
+    <div class="enrollment-section">
+      <h3>Select Course</h3>
+      <div class="search-bar">
+        <mat-icon fontIcon="search"></mat-icon>
+        <input
+          type="text"
+          placeholder="Search courses by code or title..."
+          [(ngModel)]="$courseSearchQuery"
+          class="search-input"
+          [disabled]="$isLoadingEnrollmentData() || $isLoading()"
+        />
+      </div>
+
+      @if ($isLoading()) {
+        <div class="section-loading">
+          <mat-icon fontIcon="refresh" class="spinning"></mat-icon>
+          <p>Loading courses...</p>
+        </div>
+      } @else {
+        <div class="course-list">
+          @for (course of filteredCourses(); track course.id) {
+            <div
+              class="course-item"
+              [class.course-item--selected]="$selectedCourseId() === course.id"
+              [class.disabled]="$isLoadingEnrollmentData()"
+              (click)="!$isLoadingEnrollmentData() && selectCourseForEnrollment(course.id!)"
+            >
+              <div class="course-code">{{ course.courseCode }}</div>
+              <div class="course-title">{{ course.title }}</div>
+            </div>
+          } @empty {
+            <div class="empty-state">
+              <mat-icon fontIcon="school"></mat-icon>
+              <p>No courses found</p>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="enrollment-actions">
+    <button
+      class="btn-primary btn-large"
+      (click)="enrollStudentsInCourse()"
+      [disabled]="!canEnrollInCourse() || $isLoadingEnrollmentData()"
+    >
+      <mat-icon fontIcon="person_add"></mat-icon>
+      Enroll {{ getSelectedStudentIds().length }} Student(s) in Course
+    </button>
+  </div>
+</div>
