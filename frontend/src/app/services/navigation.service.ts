@@ -27,7 +27,6 @@ export class NavigationService {
     } else if (this.permissionService.$canAccessStaffDashboard()) {
       return [
         {label: 'Dashboard', path: '/staff', icon: 'home'},
-        {label: 'Attendance', path: '/attendance', icon: 'how_to_reg'}
       ];
     } else {
       return [

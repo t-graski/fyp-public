@@ -73,7 +73,6 @@ public static class PermissionCalculator
         Permission.RoleDelete => "Delete roles",
         Permission.AttendanceRead => "View attendance records",
         Permission.AttendanceWrite => "Manage attendance records",
-        Permission.SystemBootstrap => "Bootstrap system with initial admin user",
         Permission.SuperAdmin => "Full system access (all permissions)",
         _ => "Unknown permission"
     };

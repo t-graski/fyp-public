@@ -27,7 +27,5 @@ public enum Permission : long
     AttendanceRead = 1L << 25,
     AttendanceWrite = 1L << 26,
 
-    SystemBootstrap = 1L << 30,
-
     SuperAdmin = 1L << 31,
 }

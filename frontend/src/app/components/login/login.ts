@@ -69,6 +69,8 @@ export class Login {
         },
         error: (err) => {
           if (err?.status === 401) this.errorMessage = 'Invalid email or password.';
+          else if (err?.status === 403) this.errorMessage = 'Account deactivated. Contact your administrator.';
+          else if (err?.status === 429) this.errorMessage = 'Too many failed attempts. Please try again later.'
           else this.errorMessage = 'Login failed. Please try again.';
           this.cdr.markForCheck();
         }

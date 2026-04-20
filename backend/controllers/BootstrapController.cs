@@ -15,12 +15,4 @@ public class BootstrapController(IBootstrapService bootstrap) : ControllerBase
         await bootstrap.Boostrap();
         return Ok(ApiResponse<object>.Ok(new { }));
     }
-
-    [HttpPost("propagate")]
-    [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> PropagateData()
-    {
-        await bootstrap.Propagate();
-        return Ok(ApiResponse<object>.Ok(new { }));
-    }
 }

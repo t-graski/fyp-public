@@ -66,10 +66,6 @@ export class StaffDashboardComponent implements OnInit {
     });
   }
 
-  navigateToAttendance(): void {
-    // Attendance navigation not yet implemented
-  }
-
   onSearchChange(value: string): void {
     this.$searchQuery.set(value);
   }

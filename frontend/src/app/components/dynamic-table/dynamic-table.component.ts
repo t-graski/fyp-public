@@ -34,8 +34,6 @@ export interface TableAction<T = any> {
   styleUrl: './dynamic-table.component.scss'
 })
 export class DynamicTableComponent<T extends Record<string, any>> {
-  private readonly permissionService = inject(PermissionService);
-
   $data = input<T[]>([]);
   $columns = model<TableColumn<T>[]>([]);
 
