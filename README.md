@@ -1,7 +1,7 @@
 # Testing the system
 ## Test logins
 
-The system is accessible via `https://fyp.ranchmayhem.net`
+The system is accessible via [here](https://fyp.ranchmayhem.net)
 
 Use `Test123!?` for all test accounts.
 These users have been prepared with useful and realistic data:
